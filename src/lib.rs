@@ -65,7 +65,8 @@ impl TelegrammBuilder {
             .branch(dptree::entry().endpoint(MessageHandler::unexpected_message));
 
         let callback_handler = Update::filter_callback_query()
-            .branch(case![State::CallBack].endpoint(CallBackHandler::main_commands));
+            .branch(case![State::CallBack].endpoint(CallBackHandler::main_commands))
+            .branch(case![State::CocktailForYou2 {all, game}].endpoint(CallBackHandler::game));
 
         dialogue::enter::<Update, ErasedStorage<State>, State, _>()
             .branch(message_handler)

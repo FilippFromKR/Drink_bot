@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use image::DynamicImage;
 use log::log;
-use serde::{de, Deserialize};
+use serde::{de, Deserialize,Serialize};
 use serde_json::Value;
 use tokio::sync::oneshot::channel;
 use tokio::task;
@@ -47,7 +47,7 @@ impl Display for LazyDrink {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize,Serialize, Debug,Clone)]
 pub struct Drink {
     pub name: String,
     pub ty: Option<String>,
