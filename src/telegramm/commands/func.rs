@@ -6,7 +6,7 @@ use teloxide::prelude::*;
 
 use crate::telegramm::commands::command::StartCommands;
 use crate::telegramm::{LocalDialogue, ReturnTy};
-use crate::telegramm::buttons::keyboard::make_keyboard;
+use crate::telegramm::buttons::keyboard::{as_str_vec, Keyboard, make_keyboard};
 use crate::telegramm::state::State;
 use crate::utils::read_file::read_file_as_str;
 
@@ -23,14 +23,14 @@ impl CommandsHandler {
         Ok(())
     }
     pub async fn start_commands(bot: &AutoSend<Bot>, dialogue: &LocalDialogue) -> ReturnTy {
-        let keyboard = make_keyboard();
+        let keyboard = make_keyboard(as_str_vec());
         bot.send_message(dialogue.chat_id(), "Here we go:").reply_markup(keyboard).await?;
         dialogue.update(State::CallBack).await?;
         Ok(())
     }
     async fn help(bot: AutoSend<Bot>, dialogue: LocalDialogue) -> ReturnTy {
         let text = read_file_as_str(".messages/help.txt")?;
-        let keyboard = make_keyboard();
+        let keyboard = make_keyboard(as_str_vec());
         bot.send_message(dialogue.chat_id(), text).reply_markup(keyboard).await?;
         dialogue.update(State::CallBack).await?;
         Ok(())

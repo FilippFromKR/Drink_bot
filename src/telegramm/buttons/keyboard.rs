@@ -1,11 +1,10 @@
-
 use macroses::as_array;
 use serde::{Deserialize, Serialize};
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 
 use crate::error::error_handler::{ErrorHandler, ErrorType};
 
-#[derive(as_array, Debug, Deserialize, Serialize,Clone)]
+#[derive(as_array, Debug, Deserialize, Serialize, Clone)]
 pub enum Keyboard {
     FindCocktail,
     FindIngredient,
@@ -13,6 +12,7 @@ pub enum Keyboard {
     Categories,
     WithThisIngredient,
     WithThisCategory,
+    CocktailForYou,
 
 }
 
@@ -30,14 +30,21 @@ impl TryFrom<String> for Keyboard {
     }
 }
 
-pub fn make_keyboard() -> InlineKeyboardMarkup {
+pub fn make_keyboard(vec:Vec<&str>) -> InlineKeyboardMarkup {
     let mut keyboard: Vec<Vec<InlineKeyboardButton>> = vec![];
-    for keys in Keyboard::as_array().chunks(2) {
+    for keys in vec.chunks(2) {
         let key = keys
-            .iter()
-            .map(|key| InlineKeyboardButton::callback(key.as_str(), key.as_str()))
+            .into_iter()
+            .map(|&key| InlineKeyboardButton::callback(key, key))
             .collect();
         keyboard.push(key);
     }
     InlineKeyboardMarkup::new(keyboard)
+}
+
+pub fn as_str_vec() -> Vec<&'static str> {
+    Keyboard::as_array()
+        .iter()
+        .map(|key| key.as_str())
+        .collect::<Vec<&str>>()
 }

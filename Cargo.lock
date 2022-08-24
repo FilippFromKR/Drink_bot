@@ -9,6 +9,7 @@ dependencies = [
  "dotenv",
  "envy",
  "image",
+ "itertools 0.10.3",
  "lazy_static",
  "log",
  "macroses",

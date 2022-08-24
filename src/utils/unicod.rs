@@ -114,13 +114,10 @@ impl Emojis {
             .expect("Unreachable code."))
     }
     pub fn random(&self) -> Result<&'static char, ErrorHandler> {
-        let mut rng = rand::thread_rng();
-
         let emojis = EmojiList.get(&self)
             .expect("Unreachable code.");
-        let mut uniform = Uniform::from(1..emojis.len());
 
-        Ok(emojis.get(uniform.sample(&mut rng)).expect("Unreachable code."))
+        Ok(emojis.get(Self::random_num_in_range(1, emojis.len())).expect("Unreachable code."))
     }
 
     pub fn get_randoms(&self, amount: u8) -> Result<Vec<&'static char>, ErrorHandler> {
@@ -130,5 +127,10 @@ impl Emojis {
             result.push(self.random()?);
         }
         Ok(result)
+    }
+    pub fn random_num_in_range(min: usize, max: usize) -> usize {
+        let mut rng = rand::thread_rng();
+        let mut uniform = Uniform::from(min..max);
+        uniform.sample(&mut rng)
     }
 }
