@@ -22,7 +22,6 @@ pub struct Ingredient {
     pub ty: Option<String>,
     #[serde(rename = "strAlcohol", deserialize_with = "deserialize_bool")]
     pub alco: bool,
-
 }
 ///todo:research ho to get rid clone
 impl Display for Ingredient {
@@ -31,18 +30,24 @@ impl Display for Ingredient {
             .add("Name of ingredient: ", Some(self.name.clone()))
             .add("Description: ", self.description.clone())
             .add("Type: ", self.ty.clone())
-            .add("This is alcohol: ", Some(match self.alco {
-                true => "Yes",
-                _ => "No",
-            }.to_string()))
+            .add(
+                "This is alcohol: ",
+                Some(
+                    match self.alco {
+                        true => "Yes",
+                        _ => "No",
+                    }
+                    .to_string(),
+                ),
+            )
             .get_str();
         write!(f, "{}", result)
     }
 }
 
 fn deserialize_bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
-    where
-        D: de::Deserializer<'de>,
+where
+    D: de::Deserializer<'de>,
 {
     let s: &str = de::Deserialize::deserialize(deserializer)?;
 

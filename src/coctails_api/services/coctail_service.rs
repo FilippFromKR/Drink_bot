@@ -5,7 +5,7 @@ use crate::coctails_api::schemas::drink::{Drink, LazyDrink};
 use crate::coctails_api::schemas::ingredient::Ingredient;
 use crate::coctails_api::schemas::lists::List;
 use crate::coctails_api::schemas::RawDrinkListSchema;
-use crate::error::error_handler::{ErrorHandler, ErrorType};
+use crate::error::error_handler::ErrorHandler;
 
 pub struct DrinksService;
 
@@ -31,23 +31,28 @@ impl DrinksService {
         }
     }
 
-
-    pub async fn get_ingredient_by_name(name: &str) -> Result<Option<Vec<Ingredient>>, ErrorHandler> {
+    pub async fn get_ingredient_by_name(
+        name: &str,
+    ) -> Result<Option<Vec<Ingredient>>, ErrorHandler> {
         Self::send_request::<Ingredient>(INGREDIENT_BY_NAME_URL, Some(name)).await
     }
 
     pub async fn search_by_first_letter(letter: &char) -> Result<Option<Vec<Drink>>, ErrorHandler> {
-        if let Some(result) = Self::send_request::<Value>(SEARCH_BY_FIRST_LATTER, Some(&format!("{}", letter))).await? {
-           return  Ok(Some(result
-                .into_iter()
-                .map(|drink| Drink::try_from(drink))
-                .filter(|drink| drink.is_ok())
-                .map(|drink| drink.expect("Unreachable code."))
-                .collect::<Vec<Drink>>()));
+        if let Some(result) =
+            Self::send_request::<Value>(SEARCH_BY_FIRST_LATTER, Some(&format!("{}", letter)))
+                .await?
+        {
+            return Ok(Some(
+                result
+                    .into_iter()
+                    .map(Drink::try_from)
+                    .filter(|drink| drink.is_ok())
+                    .map(|drink| drink.expect("Unreachable code."))
+                    .collect::<Vec<Drink>>(),
+            ));
         }
         Ok(None)
     }
-
 
     pub async fn get_all_ingredients() -> Result<Vec<List>, ErrorHandler> {
         let result = Self::send_request::<List>(ALL_INGREDIENTS_URL, None)
@@ -70,8 +75,10 @@ impl DrinksService {
         Self::send_request::<LazyDrink>(SEARCH_BY_CATEGORY, Some(name)).await
     }
 
-
-    async fn send_request<T: DeserializeOwned>(url: &str, addition: Option<&str>) -> Result<Option<Vec<T>>, ErrorHandler> {
+    async fn send_request<T: DeserializeOwned>(
+        url: &str,
+        addition: Option<&str>,
+    ) -> Result<Option<Vec<T>>, ErrorHandler> {
         let result = reqwest::get(format!("{}{}", url, addition.unwrap_or("")))
             .await?
             .bytes()
@@ -89,7 +96,6 @@ impl DrinksService {
         }
     }
 }
-
 
 #[cfg(test)]
 pub mod tests {
