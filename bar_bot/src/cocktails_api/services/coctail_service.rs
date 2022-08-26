@@ -1,10 +1,10 @@
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
-use crate::coctails_api::schemas::drink::{Drink, LazyDrink};
-use crate::coctails_api::schemas::ingredient::Ingredient;
-use crate::coctails_api::schemas::lists::List;
-use crate::coctails_api::schemas::RawDrinkListSchema;
+use crate::cocktails_api::schemas::drink::{Drink, LazyDrink};
+use crate::cocktails_api::schemas::ingredient::Ingredient;
+use crate::cocktails_api::schemas::lists::List;
+use crate::cocktails_api::schemas::RawDrinkListSchema;
 use crate::error::error_handler::ErrorHandler;
 use crate::ErrorType;
 
@@ -58,7 +58,10 @@ impl DrinksService {
     pub async fn get_all_ingredients() -> Result<Vec<List>, ErrorHandler> {
         let result = Self::send_request::<List>(ALL_INGREDIENTS_URL, None)
             .await?
-            .ok_or(ErrorHandler{ msg: "Exception in the cocktail Service.".to_string(), ty: ErrorType::Service})?;
+            .ok_or(ErrorHandler {
+                msg: "Exception in the cocktail Service.".to_string(),
+                ty: ErrorType::Service,
+            })?;
         Ok(result)
     }
 
@@ -67,9 +70,12 @@ impl DrinksService {
     }
 
     pub async fn get_all_category() -> Result<Vec<List>, ErrorHandler> {
-        Ok(Self::send_request::<List>(ALL_CATEGORY, None)
+        Self::send_request::<List>(ALL_CATEGORY, None)
             .await?
-            .ok_or(ErrorHandler{ msg: "Fail to get All.".to_string(), ty: ErrorType::Unexpected})?)
+            .ok_or(ErrorHandler {
+                msg: "Fail to get All.".to_string(),
+                ty: ErrorType::Unexpected,
+            })
     }
 
     pub async fn find_by_category(name: &str) -> Result<Option<Vec<LazyDrink>>, ErrorHandler> {
@@ -92,7 +98,10 @@ impl DrinksService {
             if result.is_empty() {
                 Ok(None)
             } else {
-                Ok(Some(result.drinks.ok_or(ErrorHandler{ msg: "It should never happen.".to_string(), ty: ErrorType::Unexpected })?))
+                Ok(Some(result.drinks.ok_or(ErrorHandler {
+                    msg: "It should never happen.".to_string(),
+                    ty: ErrorType::Unexpected,
+                })?))
             }
         }
     }
@@ -100,7 +109,7 @@ impl DrinksService {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::coctails_api::services::coctail_service::DrinksService;
+    use crate::cocktails_api::services::coctail_service::DrinksService;
 
     #[tokio::test]
     async fn test_drink_by_name() {

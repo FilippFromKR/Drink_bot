@@ -1,16 +1,19 @@
 use crate::telegramm::messages::message_handler::TELEGRAMM_CHAR_LIMIT;
+use crate::{ErrorHandler, ErrorType};
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 use std::fmt::Display;
-use crate::{ErrorHandler, ErrorType};
 
 pub fn random_num_in_range(min: usize, max: usize) -> usize {
     let mut rng = rand::thread_rng();
     let uniform = Uniform::from(min..max);
     uniform.sample(&mut rng)
 }
-pub fn random_english_character() -> Result<char,ErrorHandler> {
-    char::from_u32(random_num_in_range(65, 90) as u32).ok_or(ErrorHandler{ msg: "Exception in Game algorithm.".to_string(), ty: ErrorType::Unexpected })
+pub fn random_english_character() -> Result<char, ErrorHandler> {
+    char::from_u32(random_num_in_range(65, 90) as u32).ok_or(ErrorHandler {
+        msg: "Exception in Game algorithm.".to_string(),
+        ty: ErrorType::Unexpected,
+    })
 }
 
 pub fn vec_to_string<T: Display>(vec: &[T], join: &str) -> String {

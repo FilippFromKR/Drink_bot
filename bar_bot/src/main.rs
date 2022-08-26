@@ -1,10 +1,10 @@
 extern crate core;
 
-use Bar_Bot::config::Env;
-use Bar_Bot::TelegrammBuilder;
+use bar_bot::config::Env;
+use bar_bot::TelegrammBuilder;
 
 fn main() {
-    dotenv::dotenv();
+    let _ = dotenv::dotenv();
     let env = match envy::from_env::<Env>() {
         Ok(env) => env,
         Err(err) => {
