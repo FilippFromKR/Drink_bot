@@ -6,9 +6,6 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
    fmt:
     runs-on: ubuntu-latest
     steps:
