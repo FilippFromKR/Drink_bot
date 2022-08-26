@@ -19,19 +19,20 @@ jobs:
           target: wasm32-unknown-unknown
       - run: cargo build
 
-    build-release:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-          name: "Repository Checkout"
-        - uses: actions-rs/toolchain@v1
-          name: "Rust Toolchain Setup"
-          with:
-            profile: minimal
-            toolchain: nightly-2021-11-18
-            target: wasm32-unknown-unknown
-        - run: cargo build --release
-   fmt:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: "Repository Checkout"
+      - uses: actions-rs/toolchain@v1
+        name: "Rust Toolchain Setup"
+        with:
+          profile: minimal
+          toolchain: nightly-2021-11-18
+          target: wasm32-unknown-unknown
+      - run: cargo build --release
+
+  fmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
