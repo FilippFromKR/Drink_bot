@@ -197,10 +197,10 @@ impl CallBackHandler {
     async fn with_this_category(bot: AutoSend<Bot>, dialogue: LocalDialogue) -> ReturnTy {
         let user_settings: UserSettings = CommandsHandler::get_settings(&dialogue).await?;
         let message = format!(
-            "Write one of existing category, {}{}",
+            " -Write one of existing category, {}{} \n{} ",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
-            Emojis::Smile.random()?
-        );
+            Emojis::Smile.random()?,
+            " -Enter the name of the Category. Examples: Beer, Soft Drink.");
         dialogue.update(State::WithCategory(user_settings)).await?;
         bot.send_message(dialogue.chat_id(), message).await?;
         Ok(())
@@ -208,10 +208,10 @@ impl CallBackHandler {
     async fn with_this_ingredient(bot: AutoSend<Bot>, dialogue: LocalDialogue) -> ReturnTy {
         let user_settings: UserSettings = CommandsHandler::get_settings(&dialogue).await?;
         let message = format!(
-            "Write one of existing ingredient, {}{}",
+            " -Write one of existing ingredient, {}{}. \n{}",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
-            Emojis::Smile.random()?
-        );
+            Emojis::Smile.random()?,
+            " -Enter the name of the Ingredient. Examples: Tequila, Coffee.");
         dialogue
             .update(State::WithIngredient(user_settings))
             .await?;
@@ -221,10 +221,10 @@ impl CallBackHandler {
     async fn find_by_name(bot: AutoSend<Bot>, dialogue: LocalDialogue) -> ReturnTy {
         let user_settings: UserSettings = CommandsHandler::get_settings(&dialogue).await?;
         let message = format!(
-            "What kind of cocktail do you want to find, {}{}",
+            " -What kind of cocktail do you want to find, {}{} \n{}",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
-            Emojis::Smile.random()?
-        );
+            Emojis::Smile.random()?,
+            " -Enter the name or part of the name of the beverage . Examples: Coffee, Negroni.");
         dialogue.update(State::FindByName(user_settings)).await?;
         bot.send_message(dialogue.chat_id(), message).await?;
         Ok(())
@@ -232,10 +232,10 @@ impl CallBackHandler {
     async fn find_ingredient(bot: AutoSend<Bot>, dialogue: LocalDialogue) -> ReturnTy {
         let user_settings: UserSettings = CommandsHandler::get_settings(&dialogue).await?;
         let message = format!(
-            "What kind of Ingredient do you want to find, {}{}",
+            " -What kind of Ingredient do you want to find, {}{} \n{} ",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
-            Emojis::Smile.random()?
-        );
+            Emojis::Smile.random()?,
+            " -Enter the name of the Ingredient. Examples: Tequila, Coffee.");
         dialogue
             .update(State::FindIngrByName(user_settings))
             .await?;
