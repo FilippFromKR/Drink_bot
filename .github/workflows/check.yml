@@ -8,7 +8,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-  fmt:
+    steps:
+   fmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
