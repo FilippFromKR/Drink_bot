@@ -5,9 +5,8 @@ use teloxide::types::InputFile;
 use teloxide::Bot;
 use url::Url;
 
-use crate::coctails_api::schemas::drink::Drink;
-use crate::coctails_api::services::coctail_service::DrinksService;
-use crate::{ErrorHandler, ErrorType};
+use crate::cocktails_api::schemas::drink::Drink;
+use crate::cocktails_api::services::coctail_service::DrinksService;
 use crate::telegramm::buttons::keyboard::{make_keyboard, Keyboard};
 use crate::telegramm::commands::func::CommandsHandler;
 use crate::telegramm::messages::message_handler::TELEGRAMM_CHAR_LIMIT;
@@ -17,6 +16,7 @@ use crate::telegramm::{LocalDialogue, ReturnTy};
 use crate::utils::helpers;
 use crate::utils::helpers::random_num_in_range;
 use crate::utils::unicod::Emojis;
+use crate::{ErrorHandler, ErrorType};
 
 pub struct CallBackHandler;
 
@@ -155,8 +155,10 @@ impl CallBackHandler {
                 mut all,
                 game: (first, second),
                 settings,
-            } = dialogue.get().await?.ok_or(ErrorHandler{ msg: "Absents of State in dialogue.".to_string(), ty: ErrorType::Unexpected})?
-            {
+            } = dialogue.get().await?.ok_or(ErrorHandler {
+                msg: "Absents of State in dialogue.".to_string(),
+                ty: ErrorType::Unexpected,
+            })? {
                 let callback = if callback == first { second } else { first };
                 Self::filter(&callback, &mut all);
                 let drink_str = Self::ingredients_as_str_vec(&all);
@@ -174,7 +176,10 @@ impl CallBackHandler {
                         })
                         .await?;
                 } else {
-                    let drink = all.get(0).ok_or(ErrorHandler{ msg: "Exception in Game algorithm.".to_string(), ty: ErrorType::Unexpected })?;
+                    let drink = all.get(0).ok_or(ErrorHandler {
+                        msg: "Exception in Game algorithm.".to_string(),
+                        ty: ErrorType::Unexpected,
+                    })?;
                     bot.send_message(dialogue.chat_id(), &drink.to_string())
                         .await?;
                     if settings.send_image {
@@ -200,7 +205,8 @@ impl CallBackHandler {
             " -Write one of existing category, {}{} \n{} ",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
             Emojis::Smile.random()?,
-            " -Enter the name of the Category. Examples: Beer, Soft Drink.");
+            " -Enter the name of the Category. Examples: Beer, Soft Drink."
+        );
         dialogue.update(State::WithCategory(user_settings)).await?;
         bot.send_message(dialogue.chat_id(), message).await?;
         Ok(())
@@ -211,7 +217,8 @@ impl CallBackHandler {
             " -Write one of existing ingredient, {}{}. \n{}",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
             Emojis::Smile.random()?,
-            " -Enter the name of the Ingredient. Examples: Tequila, Coffee.");
+            " -Enter the name of the Ingredient. Examples: Tequila, Coffee."
+        );
         dialogue
             .update(State::WithIngredient(user_settings))
             .await?;
@@ -224,7 +231,8 @@ impl CallBackHandler {
             " -What kind of cocktail do you want to find, {}{} \n{}",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
             Emojis::Smile.random()?,
-            " -Enter the name or part of the name of the beverage . Examples: Coffee, Negroni.");
+            " -Enter the name or part of the name of the beverage . Examples: Coffee, Negroni."
+        );
         dialogue.update(State::FindByName(user_settings)).await?;
         bot.send_message(dialogue.chat_id(), message).await?;
         Ok(())
@@ -235,7 +243,8 @@ impl CallBackHandler {
             " -What kind of Ingredient do you want to find, {}{} \n{} ",
             &user_settings.name.as_ref().unwrap_or(&"".to_string()),
             Emojis::Smile.random()?,
-            " -Enter the name of the Ingredient. Examples: Tequila, Coffee.");
+            " -Enter the name of the Ingredient. Examples: Tequila, Coffee."
+        );
         dialogue
             .update(State::FindIngrByName(user_settings))
             .await?;

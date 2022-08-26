@@ -1,4 +1,4 @@
-use crate::coctails_api::schemas::drink::Drink;
+use crate::cocktails_api::schemas::drink::Drink;
 use crate::telegramm::settings::settings::{SettingsKeyboard, UserSettings};
 
 /// Todo:create struct with setting and stick it to every State, to handle user likens

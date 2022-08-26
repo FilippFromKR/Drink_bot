@@ -7,7 +7,6 @@ pub enum ErrorType {
     Telegramm,
     Unexpected,
     Parse,
-    User,
     Service,
     Database,
 }
@@ -20,10 +19,7 @@ pub struct ErrorHandler {
 
 impl ErrorHandler {
     pub fn is_critical(&self) -> bool {
-        match self.ty {
-            ErrorType::Service | ErrorType::Database => true,
-            _ => false,
-        }
+        matches!(self.ty, ErrorType::Service | ErrorType::Database)
     }
 }
 

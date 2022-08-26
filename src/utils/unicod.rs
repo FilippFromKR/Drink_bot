@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 
 use crate::error::error_handler::ErrorHandler;
-use crate::ErrorType;
 use crate::utils::helpers::random_num_in_range;
+use crate::ErrorType;
 
 type EmojiMap = HashMap<Emojis, Vec<char>>;
 
@@ -94,10 +94,15 @@ pub enum Emojis {
 
 impl Emojis {
     pub fn random(&self) -> Result<&'static char, ErrorHandler> {
-        let emojis = EMOJI_LIST.get(self).ok_or(ErrorHandler{ msg: "Absent one of emojis list.".to_string(), ty: ErrorType::Unexpected })?;
-
-        Ok(emojis
+        let emojis = EMOJI_LIST.get(self).ok_or(ErrorHandler {
+            msg: "Absent one of emojis list.".to_string(),
+            ty: ErrorType::Unexpected,
+        })?;
+        emojis
             .get(random_num_in_range(1, emojis.len()))
-            .ok_or(ErrorHandler{ msg: "Exception in random .".to_string(), ty: ErrorType::Unexpected })?)
+            .ok_or(ErrorHandler {
+                msg: "Exception in random .".to_string(),
+                ty: ErrorType::Unexpected,
+            })
     }
 }

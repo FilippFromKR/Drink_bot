@@ -6,8 +6,8 @@ use teloxide::types::InputFile;
 use teloxide::Bot;
 use url::Url;
 
-use crate::coctails_api::schemas::drink::WithPhoto;
-use crate::coctails_api::services::coctail_service::DrinksService;
+use crate::cocktails_api::schemas::drink::WithPhoto;
+use crate::cocktails_api::services::coctail_service::DrinksService;
 use crate::telegramm::buttons::callback_handler::CallBackHandler;
 use crate::telegramm::buttons::keyboard::{make_keyboard, standard_keyboard_as_str_vec};
 use crate::telegramm::commands::func::CommandsHandler;

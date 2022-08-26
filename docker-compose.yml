@@ -9,7 +9,7 @@ services:
       - ./db/:/root/db/
   app:
     build:
-      context: .
+      context: ""
     image: cloudolife/col-rust-docker
     # ports:
     #   - "8080:8080"

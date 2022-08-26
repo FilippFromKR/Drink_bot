@@ -14,7 +14,7 @@ use teloxide::dptree::case;
 use teloxide::prelude::{RequesterExt, Update};
 use teloxide::{dptree, Bot};
 
-mod coctails_api;
+mod cocktails_api;
 pub mod config;
 mod error;
 mod telegramm;
@@ -23,8 +23,7 @@ mod utils;
 pub struct TelegrammBuilder;
 
 impl TelegrammBuilder {
-
-    pub fn run(env: Env)  {
+    pub fn run(env: Env) {
         let rt = tokio::runtime::Builder::new_multi_thread()
             .worker_threads(env.workers_number)
             .max_blocking_threads(env.blocking_treads)
@@ -36,8 +35,7 @@ impl TelegrammBuilder {
         let (sx, rx) = tokio::sync::oneshot::channel();
 
         rt.block_on(async move {
-            if let Err(error) = Self::build(env).await
-            {
+            if let Err(error) = Self::build(env).await {
                 if error.is_critical() {
                     log::error!("Service critical error! Error msg: {:?}", error);
                     sx.send(0).expect("Sender failed...");
@@ -52,13 +50,11 @@ impl TelegrammBuilder {
 
             let result = rx.await.unwrap();
 
-
             if result == 0 {
                 log::info!("Service shutdown...");
                 rt.shutdown_background();
             }
         });
-
     }
 
     async fn build(env: Env) -> Result<(), ErrorHandler> {
