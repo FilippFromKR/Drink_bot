@@ -70,6 +70,7 @@ impl TelegrammBuilder {
                 })?
                 .erase();
 
+
         let handler = Self::create_handler();
 
         let bot = Bot::new(&env.bot_id).auto_send();
