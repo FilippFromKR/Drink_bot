@@ -1,16 +1,11 @@
 use core::fmt;
-use std::fmt::{Display, format, Formatter, write};
-use std::thread;
-use std::time::Duration;
+use std::fmt::{Display, Formatter};
 
-use image::DynamicImage;
-use log::log;
-use serde::{de, Deserialize,Serialize};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio::sync::oneshot::channel;
-use tokio::task;
 
-use crate::error::error_handler::{ErrorHandler, ErrorType};
+use crate::error::error_handler::ErrorHandler;
+use crate::error::error_handler::ErrorType;
 use crate::utils::str_builder::StringBuilder;
 use crate::utils::unicod::Emojis;
 
@@ -24,7 +19,9 @@ pub const INGREDIENT: &str = "strIngredient";
 pub const TY: &str = "strTags";
 pub const IMAGE: &str = "strDrinkThumb";
 
-
+pub trait WithPhoto {
+    fn get_url(&self) -> Option<&str>;
+}
 
 #[derive(Deserialize, Debug)]
 pub struct LazyDrink {
@@ -34,20 +31,22 @@ pub struct LazyDrink {
     pub image_url: String,
 }
 
-
-
+impl WithPhoto for LazyDrink {
+    fn get_url(&self) -> Option<&str> {
+        Some(self.image_url.as_str())
+    }
+}
 
 impl Display for LazyDrink {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = StringBuilder::new()
             .add("Beverage name: ", Some(self.name.clone()))
-            // .add(&format!("{} is looks like: ", self.name), Some(self.image_url.clone()))
             .get_str();
         write!(f, "{}", result)
     }
 }
 
-#[derive(Deserialize,Serialize, Debug,Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Drink {
     pub name: String,
     pub ty: Option<String>,
@@ -59,32 +58,42 @@ pub struct Drink {
     pub ingredients: Vec<(String, Option<String>)>,
 }
 
-impl Display for Drink {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let result = Emojis::Drink.get_randoms(1);
-        match result {
-            Err(err) => log::error!("{:?}",err),
-            Ok(result) => {
-                let str_builder = StringBuilder::new()
-                    .add(&format!("Here is your cocktail {} :", format!("{}", result.get(0).unwrap_or(&&' '))), Some(self.name.clone()))
-                    .add("Type of your drink: ", self.ty.clone())
-                    .add("Category is: ", self.category.clone())
-                    .add("It is with alcohol:  ", Some(match self.alco {
-                        true => "Yes".to_string(),
-                        _ => "No".to_string(),
-                    }))
-                    .add("Use this Glass for it: ", self.glass.clone())
-                    .add(&format!("How to cook the {}: ", self.name), self.instructions.clone())
-                    .add_many(&self.ingredients);
-
-
-                write!(f, "{}", str_builder.get_str());
-            }
-        };
-        Ok(())
+impl WithPhoto for Drink {
+    fn get_url(&self) -> Option<&str> {
+        match &self.image {
+            Some(str) => Some(str.as_str()),
+            _ => None,
+        }
     }
 }
 
+impl Display for Drink {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let result = Emojis::Drink.random().unwrap_or(&' ');
+        let str_builder = StringBuilder::new()
+            .add(
+                &format!("Here is your cocktail {} :", result),
+                Some(self.name.clone()),
+            )
+            .add("Type of your drink: ", self.ty.clone())
+            .add("Category is: ", self.category.clone())
+            .add(
+                "It is with alcohol:  ",
+                Some(match self.alco {
+                    true => "Yes".to_string(),
+                    _ => "No".to_string(),
+                }),
+            )
+            .add("Use this Glass for it: ", self.glass.clone())
+            .add(
+                &format!("How to cook the {}: ", self.name),
+                self.instructions.clone(),
+            )
+            .add_many(&self.ingredients);
+
+        write!(f, "{}", str_builder.get_str())
+    }
+}
 
 impl TryFrom<Value> for Drink {
     type Error = ErrorHandler;
@@ -94,7 +103,10 @@ impl TryFrom<Value> for Drink {
             name: {
                 match input.get(NAME.to_owned()) {
                     Some(value) => serde_json::from_value::<String>(value.clone())?,
-                    None => Err(ErrorHandler { msg: "Service doesn't have a drink name.".to_string(), ty: ErrorType::SERVICE })?,
+                    None => Err(ErrorHandler {
+                        msg: "Service doesn't have a drink name.".to_string(),
+                        ty: ErrorType::Service,
+                    })?,
                 }
             },
             ty: {
@@ -136,19 +148,21 @@ impl TryFrom<Value> for Drink {
             ingredients: {
                 let mut vec: Vec<(String, Option<String>)> = vec![];
                 let mut counter = 1;
-                loop {
-                    match serde_json::from_value::<Option<String>>(input.get(format!("{}{}", INGREDIENT, counter)).unwrap().clone())? {
-                        Some(ingr) => {
-                            let measure = match input.get(format!("{}{}", MEASURE, counter)) {
-                                Some(value) => serde_json::from_value::<Option<String>>(value.clone())?,
-                                None => None,
-                            };
-                            vec.push((ingr, measure));
-                            counter += 1;
-                        }
-                        None => break,
-                    }
+
+                while let Some(ingr) = serde_json::from_value::<Option<String>>(
+                    input
+                        .get(format!("{}{}", INGREDIENT, counter))
+                        .unwrap()
+                        .clone(),
+                )? {
+                    let measure = match input.get(format!("{}{}", MEASURE, counter)) {
+                        Some(value) => serde_json::from_value::<Option<String>>(value.clone())?,
+                        None => None,
+                    };
+                    vec.push((ingr, measure));
+                    counter += 1;
                 }
+
                 vec
             },
         })

@@ -12,8 +12,8 @@ pub enum Keyboard {
     Categories,
     WithThisIngredient,
     WithThisCategory,
-    CocktailForYou,
-
+    DrinkForYou,
+    Settings,
 }
 
 impl TryFrom<String> for Keyboard {
@@ -24,17 +24,21 @@ impl TryFrom<String> for Keyboard {
             .iter()
             .find(|key| key.as_str() == str)
             .ok_or(ErrorHandler {
-                msg: "Wrong string argument".to_string(),
-                ty: ErrorType::PARSE,
-            })?.clone())
+                msg: format!(
+                    "Fail to create keyboard for string, wrong argument:  {}",
+                    &str
+                ),
+                ty: ErrorType::Parse,
+            })?
+            .clone())
     }
 }
 
-pub fn make_keyboard(vec:Vec<&str>) -> InlineKeyboardMarkup {
+pub fn make_keyboard(vec: &[&str]) -> InlineKeyboardMarkup {
     let mut keyboard: Vec<Vec<InlineKeyboardButton>> = vec![];
     for keys in vec.chunks(2) {
         let key = keys
-            .into_iter()
+            .iter()
             .map(|&key| InlineKeyboardButton::callback(key, key))
             .collect();
         keyboard.push(key);
@@ -42,7 +46,7 @@ pub fn make_keyboard(vec:Vec<&str>) -> InlineKeyboardMarkup {
     InlineKeyboardMarkup::new(keyboard)
 }
 
-pub fn as_str_vec() -> Vec<&'static str> {
+pub fn standard_keyboard_as_str_vec() -> Vec<&'static str> {
     Keyboard::as_array()
         .iter()
         .map(|key| key.as_str())

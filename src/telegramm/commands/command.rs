@@ -6,6 +6,4 @@ use teloxide::utils::command::BotCommands;
 pub enum StartCommands {
     Start,
     Help,
-    Finish,
-    // Registration,
 }
