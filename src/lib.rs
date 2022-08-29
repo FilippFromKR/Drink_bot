@@ -13,12 +13,12 @@ use teloxide::dispatching::{dialogue, Dispatcher, UpdateFilterExt, UpdateHandler
 use teloxide::dptree::case;
 use teloxide::prelude::{RequesterExt, Update};
 use teloxide::{dptree, Bot};
-
 mod cocktails_api;
 pub mod config;
 mod error;
 mod telegramm;
 mod utils;
+mod localization;
 
 pub struct TelegrammBuilder;
 
@@ -117,5 +117,42 @@ impl TelegrammBuilder {
         dialogue::enter::<Update, ErasedStorage<State>, State, _>()
             .branch(message_handler)
             .branch(callback_handler)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::fs::File;
+    use std::io::{BufReader, Read};
+    use serde_json::Value;
+    use crate::localization::schemas::LangConfig;
+
+    #[test]
+    fn test() {
+        let file = File::open("./localization/ukr.json")
+            .expect("could not open file");
+        let mut buffered_reader = BufReader::new(file);
+        let bytes =  buffered_reader
+            .bytes()
+            .filter(|b|b.is_ok())
+            .map(|b|b.unwrap())
+            .collect::<Vec<u8>>();
+        println!("{}",serde_json::from_slice::<Value>(bytes.as_slice()).unwrap());
+
+
+    }
+    #[test]
+    fn test2() {
+        let file = File::open("./localization/ukr.json")
+            .expect("could not open file");
+        let mut buffered_reader = BufReader::new(file);
+        let bytes =  buffered_reader
+            .bytes()
+            .filter(|b|b.is_ok())
+            .map(|b|b.unwrap())
+            .collect::<Vec<u8>>();
+        println!("{:?}",serde_json::from_slice::<LangConfig>(bytes.as_slice()).unwrap());
+
+
     }
 }

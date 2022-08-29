@@ -21,3 +21,4 @@ log = "0.4.17"
 rand = "0.8.5"
 lazy_static = "1.4.0"
 macroses = { git = "ssh://git@github.com/FilippFromKR/Note_bot.git", branch = "master" }
+
