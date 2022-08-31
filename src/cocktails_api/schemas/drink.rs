@@ -1,11 +1,13 @@
-use core::fmt;
 use std::fmt::{Display, Formatter};
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::cocktails_api::schemas::ToLangDrink;
 use crate::error::error_handler::ErrorHandler;
 use crate::error::error_handler::ErrorType;
+use crate::localization::lang::Lang;
 use crate::utils::str_builder::StringBuilder;
 use crate::utils::unicod::Emojis;
 
@@ -20,7 +22,7 @@ pub const TY: &str = "strTags";
 pub const IMAGE: &str = "strDrinkThumb";
 
 pub trait WithPhoto {
-    fn get_url(&self) -> Option<&str>;
+    fn get_url(&self) -> Option<String>;
 }
 
 #[derive(Deserialize, Debug)]
@@ -31,16 +33,36 @@ pub struct LazyDrink {
     pub image_url: String,
 }
 
-impl WithPhoto for LazyDrink {
-    fn get_url(&self) -> Option<&str> {
-        Some(self.image_url.as_str())
+pub struct LangLazyDrink {
+    pub lazy: LazyDrink,
+    pub lang: Arc<Lang>,
+
+}
+
+impl ToLangDrink<LazyDrink> for LangLazyDrink {
+    type Output = LazyDrink;
+    fn new(drink: LazyDrink, lang: Arc<Lang>) -> Result<Self, ErrorHandler> {
+        Ok(Self {
+            lazy: drink,
+            lang,
+        })
+    }
+    fn get_drink(&self) -> &LazyDrink {
+        &self.lazy
     }
 }
 
-impl Display for LazyDrink {
+
+impl WithPhoto for LangLazyDrink {
+    fn get_url(&self) -> Option<String> {
+        Some(self.lazy.image_url.clone())
+    }
+}
+
+impl Display for LangLazyDrink {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = StringBuilder::new()
-            .add("Beverage name: ", Some(self.name.clone()))
+            .add(&self.lang.service_responses.beverage_name, Some(self.lazy.name.clone()))
             .get_str();
         write!(f, "{}", result)
     }
@@ -56,49 +78,39 @@ pub struct Drink {
     pub instructions: Option<String>,
     pub image: Option<String>,
     pub ingredients: Vec<(String, Option<String>)>,
+
 }
 
-impl WithPhoto for Drink {
-    fn get_url(&self) -> Option<&str> {
-        match &self.image {
-            Some(str) => Some(str.as_str()),
-            _ => None,
-        }
+impl ToLangDrink<Value> for LangDrink {
+    type Output = Drink;
+
+    fn new(drink: Value, lang: Arc<Lang>) -> Result<Self, ErrorHandler> {
+        Ok(Self {
+            drink: Self::drink_from_value(&drink)?,
+            lang,
+        })
+    }
+    fn get_drink(&self) -> &Drink {
+        &self.drink
     }
 }
 
-impl Display for Drink {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let result = Emojis::Drink.random().unwrap_or(&' ');
-        let str_builder = StringBuilder::new()
-            .add(
-                &format!("Here is your cocktail {} :", result),
-                Some(self.name.clone()),
-            )
-            .add("Type of your drink: ", self.ty.clone())
-            .add("Category is: ", self.category.clone())
-            .add(
-                "It is with alcohol:  ",
-                Some(match self.alco {
-                    true => "Yes".to_string(),
-                    _ => "No".to_string(),
-                }),
-            )
-            .add("Use this Glass for it: ", self.glass.clone())
-            .add(
-                &format!("How to cook the {}: ", self.name),
-                self.instructions.clone(),
-            )
-            .add_many(&self.ingredients);
-
-        write!(f, "{}", str_builder.get_str())
-    }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct LangDrink {
+    pub drink: Drink,
+    pub lang: Arc<Lang>,
 }
 
-impl TryFrom<Value> for Drink {
-    type Error = ErrorHandler;
+impl LangDrink {
+    pub fn new(value: Value, lang: Arc<Lang>) -> Result<Self, ErrorHandler> {
+        Ok(Self {
+            drink: Self::drink_from_value(&value)?,
+            lang,
+        })
+    }
 
-    fn try_from(input: Value) -> Result<Drink, Self::Error> {
+
+    fn drink_from_value(input: &Value) -> Result<Drink, ErrorHandler> {
         Ok(Drink {
             name: {
                 match input.get(NAME.to_owned()) {
@@ -168,3 +180,39 @@ impl TryFrom<Value> for Drink {
         })
     }
 }
+
+impl WithPhoto for LangDrink {
+    fn get_url(&self) -> Option<String> {
+        self.get_drink().image.as_ref().cloned()
+    }
+}
+
+
+impl Display for LangDrink {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let result = Emojis::Drink.random().unwrap_or(&' ');
+        let drink = self.get_drink();
+        let str_builder = StringBuilder::new()
+            .add(
+                &format!("{} {} :", &self.lang.service_responses.beverage_name, result),
+                Some(drink.name.clone()),
+            )
+            .add(&format!("{}: ", &self.lang.service_responses.ty), drink.ty.clone())
+            .add(&format!("{}: ", &self.lang.service_responses.category), drink.category.clone())
+            .add(
+                &format!("{}: ",&self.lang.service_responses.alco),
+                Some(match drink.alco {
+                    true => self.lang.settings_descriptions.yes.clone(),
+                    _ => self.lang.settings_descriptions.no.clone(),
+                }),
+            )
+            .add(&format!("{}: ", self.lang.service_responses.glass), drink.glass.clone())
+            .add(
+                &format!("{}: ", self.lang.service_responses.cook), drink.instructions.clone(),
+            )
+            .add_many(&drink.ingredients);
+
+        write!(f, "{}", str_builder.get_str())
+    }
+}
+

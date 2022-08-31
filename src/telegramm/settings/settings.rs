@@ -4,12 +4,14 @@ use crate::error::error_handler::{ErrorHandler, ErrorType};
 use crate::utils::str_builder::StringBuilder;
 use macroses::as_array;
 use serde::{Deserialize, Serialize};
+use crate::localization::lang::Lang;
 
 #[derive(as_array, Deserialize, Serialize, Clone, Debug)]
 pub enum SettingsKeyboard {
     Name,
     Images,
     MessageLimit,
+    Lang,
     Back,
 }
 
@@ -34,20 +36,23 @@ pub struct UserSettings {
     pub name: Option<String>,
     pub send_image: bool,
     pub limit_of_messages: u32,
+    pub lang: Lang,
 }
 
 impl Display for UserSettings {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+
         let result = StringBuilder::new()
-            .add("As far as i know, your name is: ", Some(self.name.clone().unwrap_or_else(||"Bro".to_string())))
-            .add("This parameter defines if the images will be shown or not. Current configuration is: ", Some(match self.send_image {
-                true => "Yes".to_owned(),
-                false => "No".to_owned()
+            .add(&format!(" -{} \n",&self.lang.settings_descriptions.name), Some(self.name.clone().unwrap_or_else(||"Bro".to_string())))
+            .add(&format!(" -{} \n",&self.lang.settings_descriptions.image), Some(match self.send_image {
+                true =>   self.lang.settings_descriptions.yes.clone(),
+                false =>   self.lang.settings_descriptions.no.clone()
             }))
-            .add("Limit defines the max value of received messages at once. \
-            Some responses could include a dozens of it, \
-            we predict that it may be annoying. \
-            The algorithm chooses a random slice of all results, so you will not lose anything, so feel free to configure it. Current amount of messages is:  ", Some(self.limit_of_messages.to_string()))
+            .add(&format!(" -{} \n",&self.lang.settings_descriptions.lang),Some(match self.lang {
+                Lang::Ukr =>   self.lang.settings_descriptions.lang_ukr.clone(),
+                Lang::Eng =>   self.lang.settings_descriptions.lang_eng.clone()
+            }))
+            .add(&format!(" -{} \n",&self.lang.settings_descriptions.limit), Some(self.limit_of_messages.to_string()))
 
             .get_str();
         write!(f, "{}", result)
@@ -60,6 +65,7 @@ impl Default for UserSettings {
             name: Some("Dear".to_string()),
             send_image: true,
             limit_of_messages: 10,
+            lang: Lang::Ukr,
         }
     }
 }

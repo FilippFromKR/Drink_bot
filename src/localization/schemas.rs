@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -7,6 +9,13 @@ pub struct LangConfig {
     pub todo: Todo,
     pub service_responses: ServiceResponses,
     pub settings_descriptions: SettingsDescriptions,
+    pub buttons: MainButtons,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MainButtons {
+    pub main: HashMap<String, String>,
+    pub settings: HashMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -48,7 +57,7 @@ pub struct ServiceResponses {
 pub struct SettingsDescriptions {
     pub name: String,
     pub lang: String,
-    pub lang_urk: String,
+    pub lang_ukr: String,
     pub lang_eng: String,
     pub yes: String,
     pub no: String,

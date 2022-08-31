@@ -1,12 +1,15 @@
+use std::sync::Arc;
+
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
-use crate::cocktails_api::schemas::drink::{Drink, LazyDrink};
-use crate::cocktails_api::schemas::ingredient::Ingredient;
-use crate::cocktails_api::schemas::lists::List;
-use crate::cocktails_api::schemas::RawDrinkListSchema;
+use crate::cocktails_api::schemas::{RawDrinkListSchema, ToLangDrink};
+use crate::cocktails_api::schemas::drink::{LangDrink, LangLazyDrink, LazyDrink};
+use crate::cocktails_api::schemas::ingredient::{Ingredient, LangIngredient};
+use crate::cocktails_api::schemas::lists::{LangList, List};
 use crate::error::error_handler::ErrorHandler;
 use crate::ErrorType;
+use crate::localization::lang::Lang;
 
 pub struct DrinksService;
 
@@ -19,11 +22,12 @@ const SEARCH_BY_CATEGORY: &str = "https://www.thecocktaildb.com/api/json/v1/1/fi
 const SEARCH_BY_FIRST_LATTER: &str = "https://www.thecocktaildb.com/api/json/v1/1/search.php?f=";
 
 impl DrinksService {
-    pub async fn get_drink_by_name(name: &str) -> Result<Option<Vec<Drink>>, ErrorHandler> {
+    pub async fn get_drink_by_name(name: &str, lang: Lang) -> Result<Option<Vec<LangDrink>>, ErrorHandler> {
         if let Some(drinks) = Self::send_request::<Value>(DRINK_BY_NAME_URL, Some(name)).await? {
             let mut vec_drinks = Vec::with_capacity(drinks.len());
+            let lang = Arc::new(lang);
             for drink in drinks {
-                vec_drinks.push(Drink::try_from(drink)?);
+                vec_drinks.push(LangDrink::new(drink, lang.clone())?);
             }
 
             Ok(Some(vec_drinks))
@@ -34,52 +38,79 @@ impl DrinksService {
 
     pub async fn get_ingredient_by_name(
         name: &str,
-    ) -> Result<Option<Vec<Ingredient>>, ErrorHandler> {
-        Self::send_request::<Ingredient>(INGREDIENT_BY_NAME_URL, Some(name)).await
+        lang: Lang,
+    ) -> Result<Option<Vec<LangIngredient>>, ErrorHandler> {
+        let lang = Arc::new(lang);
+        let result = Self::send_request::<Ingredient>(INGREDIENT_BY_NAME_URL, Some(name)).await?.map(|ingredients| ingredients
+            .into_iter()
+            .filter_map(|ing| match LangIngredient::new(ing, lang.clone()) {
+                Err(_) => None,
+                Ok(ing) => Some(ing)
+            })
+            .collect::<Vec<LangIngredient>>());
+        Ok(result)
     }
 
-    pub async fn search_by_first_letter(letter: &char) -> Result<Option<Vec<Drink>>, ErrorHandler> {
+    pub async fn search_by_first_letter(letter: &char, lang: Lang) -> Result<Option<Vec<LangDrink>>, ErrorHandler> {
         if let Some(result) =
-            Self::send_request::<Value>(SEARCH_BY_FIRST_LATTER, Some(&format!("{}", letter)))
-                .await?
+        Self::send_request::<Value>(SEARCH_BY_FIRST_LATTER, Some(&format!("{}", letter)))
+            .await?
         {
+            let lang = Arc::new(lang);
             return Ok(Some(
                 result
                     .into_iter()
-                    .map(Drink::try_from)
-                    .filter(|drink| drink.is_ok())
-                    .map(|drink| drink.expect("Unreachable code."))
-                    .collect::<Vec<Drink>>(),
+                    .filter_map(|value| match LangDrink::new(value, lang.clone()) {
+                        Ok(result) => Some(result),
+                        Err(_) => None,
+                    })
+                    .collect::<Vec<LangDrink>>(),
             ));
         }
         Ok(None)
     }
 
-    pub async fn get_all_ingredients() -> Result<Vec<List>, ErrorHandler> {
-        let result = Self::send_request::<List>(ALL_INGREDIENTS_URL, None)
-            .await?
+    pub async fn get_all_ingredients(lang: Lang) -> Result<Vec<LangList>, ErrorHandler> {
+        let result = Self::send_request::<List>(ALL_INGREDIENTS_URL, None).await?
             .ok_or(ErrorHandler {
                 msg: "Exception in the cocktail Service.".to_string(),
                 ty: ErrorType::Service,
             })?;
+        let result = Self::to_lazy(result, Arc::new(lang));
+
         Ok(result)
     }
 
-    pub async fn find_by_ingredient(name: &str) -> Result<Option<Vec<LazyDrink>>, ErrorHandler> {
-        Self::send_request::<LazyDrink>(SEARCH_BY_INGREDIENT, Some(name)).await
+    pub async fn find_by_ingredient(name: &str, lang: Lang) -> Result<Option<Vec<LangLazyDrink>>, ErrorHandler> {
+        let result =  Self::send_request::<LazyDrink>(SEARCH_BY_INGREDIENT, Some(name)).await?
+            .map(|drinks |Self::to_lazy(drinks, Arc::new(lang)));
+        Ok(result)
     }
 
-    pub async fn get_all_category() -> Result<Vec<List>, ErrorHandler> {
-        Self::send_request::<List>(ALL_CATEGORY, None)
+    pub async fn get_all_category(lang: Lang) -> Result<Vec<LangList>, ErrorHandler> {
+        let result = Self::send_request::<List>(ALL_CATEGORY, None)
             .await?
             .ok_or(ErrorHandler {
                 msg: "Fail to get All.".to_string(),
                 ty: ErrorType::Unexpected,
-            })
+            })?;
+        Ok(Self::to_lazy(result, Arc::new(lang)))
     }
 
-    pub async fn find_by_category(name: &str) -> Result<Option<Vec<LazyDrink>>, ErrorHandler> {
-        Self::send_request::<LazyDrink>(SEARCH_BY_CATEGORY, Some(name)).await
+    pub async fn find_by_category(name: &str, lang: Lang) -> Result<Option<Vec<LangLazyDrink>>, ErrorHandler> {
+        let result =  Self::send_request::<LazyDrink>(SEARCH_BY_CATEGORY, Some(name)).await?
+            .map(|drinks| Self::to_lazy(drinks, Arc::new(lang)));
+
+        Ok(result)
+    }
+    pub fn to_lazy<F, T: ToLangDrink<F>>(drinks: Vec<F>, lang: Arc<Lang>) -> Vec<T> {
+        drinks
+            .into_iter()
+            .filter_map(|drink| match T::new(drink, lang.clone()) {
+                Err(_) => None,
+                Ok(t) => Some(t),
+            })
+            .collect::<Vec<T>>()
     }
 
     async fn send_request<T: DeserializeOwned>(
@@ -110,10 +141,11 @@ impl DrinksService {
 #[cfg(test)]
 pub mod tests {
     use crate::cocktails_api::services::coctail_service::DrinksService;
+    use crate::localization::lang::Lang;
 
     #[tokio::test]
     async fn test_drink_by_name() {
-        let result = DrinksService::get_drink_by_name("Margarita").await;
+        let result = DrinksService::get_drink_by_name("Margarita", &Lang::Ukr).await;
 
         assert!(result.is_ok())
     }
