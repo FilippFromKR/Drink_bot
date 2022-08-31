@@ -1,8 +1,19 @@
+use std::sync::Arc;
+
 use serde::Deserialize;
+
+use crate::ErrorHandler;
+use crate::localization::lang::Lang;
 
 pub mod drink;
 pub mod ingredient;
 pub mod lists;
+
+pub trait ToLangDrink<T> {
+    type Output;
+    fn new(drink: T, lang: Arc<Lang>) -> Result<Self, ErrorHandler> where Self: Sized;
+    fn get_drink(&self) -> &Self::Output;
+}
 
 #[derive(Deserialize, Debug)]
 pub struct RawDrinkListSchema<T> {

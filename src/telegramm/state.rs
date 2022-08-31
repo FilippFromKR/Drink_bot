@@ -1,4 +1,4 @@
-use crate::cocktails_api::schemas::drink::Drink;
+use crate::cocktails_api::schemas::drink::LangDrink;
 use crate::telegramm::settings::settings::{SettingsKeyboard, UserSettings};
 
 /// Todo:create struct with setting and stick it to every State, to handle user likens
@@ -17,7 +17,7 @@ pub enum State {
     CocktailForYou {
         settings: UserSettings,
         game: (String, String),
-        all: Vec<Drink>,
+        all: Vec<LangDrink>,
     },
 }
 

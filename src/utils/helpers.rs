@@ -23,9 +23,15 @@ pub fn vec_to_string<T: Display>(vec: &[T], join: &str) -> String {
         .join(join)
 }
 
+
+/// TODO:fix bag with string separating
+/// separates bytes on wrong way and panic
+/// probable, need to change this 'message.split_at(message.len()  / 2)' for something else
+/// '+10' make it works, however it's shoudn't work like this.
+/// to find bag, call:  find_cocktail->coffee->panic
 pub fn split(message: &str) -> Vec<String> {
     let mut vec: Vec<String> = vec![];
-    let (first, second) = message.split_at(message.len() / 2);
+    let (first, second) = message.split_at((message.len()  / 2) + 10);
     if first.len() >= TELEGRAMM_CHAR_LIMIT {
         let mut first = split(first);
         let mut second = split(second);

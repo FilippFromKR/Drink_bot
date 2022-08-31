@@ -13,12 +13,12 @@ use teloxide::dispatching::{dialogue, Dispatcher, UpdateFilterExt, UpdateHandler
 use teloxide::dptree::case;
 use teloxide::prelude::{RequesterExt, Update};
 use teloxide::{dptree, Bot};
-
 mod cocktails_api;
 pub mod config;
 mod error;
 mod telegramm;
 mod utils;
+mod localization;
 
 pub struct TelegrammBuilder;
 

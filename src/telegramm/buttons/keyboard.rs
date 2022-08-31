@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 
 use crate::error::error_handler::{ErrorHandler, ErrorType};
+use crate::localization::schemas::LangConfig;
 
 #[derive(as_array, Debug, Deserialize, Serialize, Clone)]
 pub enum Keyboard {
@@ -46,9 +47,9 @@ pub fn make_keyboard(vec: &[&str]) -> InlineKeyboardMarkup {
     InlineKeyboardMarkup::new(keyboard)
 }
 
-pub fn standard_keyboard_as_str_vec() -> Vec<&'static str> {
+pub fn standard_keyboard_as_str_vec(lang: &LangConfig) -> Vec<&str> {
     Keyboard::as_array()
         .iter()
-        .map(|key| key.as_str())
+        .map( |key| lang.buttons.main.get(key.as_str()).expect("Unexpected code.").as_str())
         .collect::<Vec<&str>>()
 }

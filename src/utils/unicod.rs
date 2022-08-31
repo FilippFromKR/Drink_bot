@@ -83,7 +83,6 @@ lazy_static! {
     };
 }
 
-/// todo:add path to consts
 #[derive(Debug, Eq, Hash, PartialEq)]
 pub enum Emojis {
     Drink,

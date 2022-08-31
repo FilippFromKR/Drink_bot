@@ -11,13 +11,14 @@ pub struct CommandsHandler;
 
 impl CommandsHandler {
     pub async fn start_commands(bot: &AutoSend<Bot>, dialogue: &LocalDialogue) -> ReturnTy {
-        let keyboard = make_keyboard(&standard_keyboard_as_str_vec());
+        let UserSettings{lang,..} = CommandsHandler::get_settings(dialogue).await?;
+        let keyboard = make_keyboard(&standard_keyboard_as_str_vec(&lang));
         dialogue
             .update(State::CallBack(
                 CommandsHandler::get_settings(dialogue).await?,
             ))
             .await?;
-        bot.send_message(dialogue.chat_id(), "Here we go: ")
+        bot.send_message(dialogue.chat_id(), &lang.send_commands)
             .reply_markup(keyboard)
             .await?;
 
