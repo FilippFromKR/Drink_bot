@@ -43,25 +43,25 @@ impl Display for UserSettings {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = StringBuilder::new()
             .add(
-                &format!(" -{} \n", &self.lang.settings_descriptions.name),
+                &self.lang.settings_descriptions.name,
                 Some(self.name.clone().unwrap_or_else(|| "Bro".to_string())),
             )
             .add(
-                &format!(" -{} \n", &self.lang.settings_descriptions.image),
+                &self.lang.settings_descriptions.image,
                 Some(match self.send_image {
                     true => self.lang.settings_descriptions.yes.clone(),
                     false => self.lang.settings_descriptions.no.clone(),
                 }),
             )
             .add(
-                &format!(" -{} \n", &self.lang.settings_descriptions.lang),
+                &self.lang.settings_descriptions.lang,
                 Some(match self.lang {
                     Lang::Ukr => self.lang.settings_descriptions.lang_ukr.clone(),
                     Lang::Eng => self.lang.settings_descriptions.lang_eng.clone(),
                 }),
             )
             .add(
-                &format!(" -{} \n", &self.lang.settings_descriptions.limit),
+                &self.lang.settings_descriptions.limit,
                 Some(self.limit_of_messages.to_string()),
             )
             .get_str();

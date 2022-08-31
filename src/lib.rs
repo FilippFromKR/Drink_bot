@@ -20,6 +20,8 @@ mod localization;
 mod telegramm;
 mod utils;
 
+
+/// todo: make tests work and add it to workflow
 pub struct TelegrammBuilder;
 
 impl TelegrammBuilder {
