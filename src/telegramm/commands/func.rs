@@ -11,7 +11,7 @@ pub struct CommandsHandler;
 
 impl CommandsHandler {
     pub async fn start_commands(bot: &AutoSend<Bot>, dialogue: &LocalDialogue) -> ReturnTy {
-        let UserSettings{lang,..} = CommandsHandler::get_settings(dialogue).await?;
+        let UserSettings { lang, .. } = CommandsHandler::get_settings(dialogue).await?;
         let keyboard = make_keyboard(&standard_keyboard_as_str_vec(&lang));
         dialogue
             .update(State::CallBack(

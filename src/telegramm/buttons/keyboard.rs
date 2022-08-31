@@ -50,6 +50,12 @@ pub fn make_keyboard(vec: &[&str]) -> InlineKeyboardMarkup {
 pub fn standard_keyboard_as_str_vec(lang: &LangConfig) -> Vec<&str> {
     Keyboard::as_array()
         .iter()
-        .map( |key| lang.buttons.main.get(key.as_str()).expect("Unexpected code.").as_str())
+        .map(|key| {
+            lang.buttons
+                .main
+                .get(key.as_str())
+                .expect("Unexpected code.")
+                .as_str()
+        })
         .collect::<Vec<&str>>()
 }

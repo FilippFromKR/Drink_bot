@@ -36,22 +36,17 @@ pub struct LazyDrink {
 pub struct LangLazyDrink {
     pub lazy: LazyDrink,
     pub lang: Arc<Lang>,
-
 }
 
 impl ToLangDrink<LazyDrink> for LangLazyDrink {
     type Output = LazyDrink;
     fn new(drink: LazyDrink, lang: Arc<Lang>) -> Result<Self, ErrorHandler> {
-        Ok(Self {
-            lazy: drink,
-            lang,
-        })
+        Ok(Self { lazy: drink, lang })
     }
     fn get_drink(&self) -> &LazyDrink {
         &self.lazy
     }
 }
-
 
 impl WithPhoto for LangLazyDrink {
     fn get_url(&self) -> Option<String> {
@@ -62,7 +57,10 @@ impl WithPhoto for LangLazyDrink {
 impl Display for LangLazyDrink {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = StringBuilder::new()
-            .add(&self.lang.service_responses.beverage_name, Some(self.lazy.name.clone()))
+            .add(
+                &self.lang.service_responses.beverage_name,
+                Some(self.lazy.name.clone()),
+            )
             .get_str();
         write!(f, "{}", result)
     }
@@ -78,7 +76,6 @@ pub struct Drink {
     pub instructions: Option<String>,
     pub image: Option<String>,
     pub ingredients: Vec<(String, Option<String>)>,
-
 }
 
 impl ToLangDrink<Value> for LangDrink {
@@ -108,7 +105,6 @@ impl LangDrink {
             lang,
         })
     }
-
 
     fn drink_from_value(input: &Value) -> Result<Drink, ErrorHandler> {
         Ok(Drink {
@@ -187,32 +183,43 @@ impl WithPhoto for LangDrink {
     }
 }
 
-
 impl Display for LangDrink {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = Emojis::Drink.random().unwrap_or(&' ');
         let drink = self.get_drink();
         let str_builder = StringBuilder::new()
             .add(
-                &format!("{} {} :", &self.lang.service_responses.beverage_name, result),
+                &format!(
+                    "{} {} :",
+                    &self.lang.service_responses.beverage_name, result
+                ),
                 Some(drink.name.clone()),
             )
-            .add(&format!("{}: ", &self.lang.service_responses.ty), drink.ty.clone())
-            .add(&format!("{}: ", &self.lang.service_responses.category), drink.category.clone())
             .add(
-                &format!("{}: ",&self.lang.service_responses.alco),
+                &format!("{}: ", &self.lang.service_responses.ty),
+                drink.ty.clone(),
+            )
+            .add(
+                &format!("{}: ", &self.lang.service_responses.category),
+                drink.category.clone(),
+            )
+            .add(
+                &format!("{}: ", &self.lang.service_responses.alco),
                 Some(match drink.alco {
                     true => self.lang.settings_descriptions.yes.clone(),
                     _ => self.lang.settings_descriptions.no.clone(),
                 }),
             )
-            .add(&format!("{}: ", self.lang.service_responses.glass), drink.glass.clone())
             .add(
-                &format!("{}: ", self.lang.service_responses.cook), drink.instructions.clone(),
+                &format!("{}: ", self.lang.service_responses.glass),
+                drink.glass.clone(),
+            )
+            .add(
+                &format!("{}: ", self.lang.service_responses.cook),
+                drink.instructions.clone(),
             )
             .add_many(&drink.ingredients);
 
         write!(f, "{}", str_builder.get_str())
     }
 }
-

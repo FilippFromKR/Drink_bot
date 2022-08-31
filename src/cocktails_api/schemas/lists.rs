@@ -4,8 +4,8 @@ use std::sync::Arc;
 use serde::Deserialize;
 
 use crate::cocktails_api::schemas::ToLangDrink;
-use crate::ErrorHandler;
 use crate::localization::lang::Lang;
+use crate::ErrorHandler;
 
 #[derive(Deserialize)]
 pub struct List {
@@ -21,20 +21,19 @@ pub struct LangList {
 impl ToLangDrink<List> for LangList {
     type Output = List;
     fn new(drink: List, lang: Arc<Lang>) -> Result<Self, ErrorHandler> {
-        Ok(Self {
-            list: drink,
-            lang,
-        })
+        Ok(Self { list: drink, lang })
     }
     fn get_drink(&self) -> &Self::Output {
         &self.list
     }
 }
 
-
-
 impl Display for LangList {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, " - {} {}", self.lang.service_responses.beverage_name, self.list.name)
+        write!(
+            f,
+            " - {} {}",
+            self.lang.service_responses.beverage_name, self.list.name
+        )
     }
 }

@@ -27,7 +27,6 @@ pub struct FailMessages {
     pub wrong_category: String,
     pub wrong_ingredient: String,
     pub try_again: String,
-
 }
 
 #[derive(Debug, Deserialize)]

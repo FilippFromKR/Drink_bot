@@ -4,9 +4,9 @@ use std::sync::Arc;
 use serde::{de, Deserialize};
 
 use crate::cocktails_api::schemas::ToLangDrink;
-use crate::ErrorHandler;
 use crate::localization::lang::Lang;
 use crate::utils::str_builder::StringBuilder;
+use crate::ErrorHandler;
 
 #[derive(Deserialize, Debug)]
 pub struct Ingredient {
@@ -38,13 +38,21 @@ impl ToLangDrink<Ingredient> for LangIngredient {
     }
 }
 
-
 impl Display for LangIngredient {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = StringBuilder::new()
-            .add(&format!("{}: ", self.lang.service_responses.ingredient_name), Some(self.ingredient.name.clone()))
-            .add(&format!("{}: ", self.lang.service_responses.description), self.ingredient.description.clone())
-            .add(&format!("{}: ", self.lang.service_responses.ty), self.ingredient.ty.clone())
+            .add(
+                &format!("{}: ", self.lang.service_responses.ingredient_name),
+                Some(self.ingredient.name.clone()),
+            )
+            .add(
+                &format!("{}: ", self.lang.service_responses.description),
+                self.ingredient.description.clone(),
+            )
+            .add(
+                &format!("{}: ", self.lang.service_responses.ty),
+                self.ingredient.ty.clone(),
+            )
             .add(
                 &format!("{}: ", self.lang.service_responses.alco),
                 Some(
@@ -52,7 +60,7 @@ impl Display for LangIngredient {
                         true => &self.lang.settings_descriptions.yes,
                         _ => &self.lang.settings_descriptions.no,
                     }
-                        .to_string(),
+                    .to_string(),
                 ),
             )
             .get_str();
@@ -61,8 +69,8 @@ impl Display for LangIngredient {
 }
 
 fn deserialize_bool<'de, D>(deserializer: D) -> Result<bool, D::Error>
-    where
-        D: de::Deserializer<'de>,
+where
+    D: de::Deserializer<'de>,
 {
     let s: &str = de::Deserialize::deserialize(deserializer)?;
 

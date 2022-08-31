@@ -1,19 +1,19 @@
 use std::fmt::Display;
 
-use teloxide::Bot;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{AutoSend, Message, Requester};
 use teloxide::types::InputFile;
+use teloxide::Bot;
 use url::Url;
 
 use crate::cocktails_api::schemas::drink::WithPhoto;
 use crate::cocktails_api::services::coctail_service::DrinksService;
-use crate::telegramm::{LocalDialogue, ReturnTy};
 use crate::telegramm::buttons::callback_handler::CallBackHandler;
 use crate::telegramm::buttons::keyboard::{make_keyboard, standard_keyboard_as_str_vec};
 use crate::telegramm::commands::func::CommandsHandler;
 use crate::telegramm::settings::settings::{SettingsKeyboard, UserSettings};
 use crate::telegramm::state::State;
+use crate::telegramm::{LocalDialogue, ReturnTy};
 use crate::utils::helpers::{random_num_in_range, vec_to_string};
 use crate::utils::unicod::Emojis;
 
@@ -38,7 +38,7 @@ impl MessageHandler {
                 message.text().unwrap_or("")
             ),
         )
-            .await?;
+        .await?;
         CommandsHandler::start_commands(&bot, &dialogue).await?;
         Ok(())
     }
@@ -49,12 +49,12 @@ impl MessageHandler {
     ) -> ReturnTy {
         if let Some(message) = message.text() {
             let settings = if let State::SettingsUpdate(mut settings, SettingsKeyboard::Name) =
-            dialogue.get().await?.expect("Untraceable code.")
+                dialogue.get().await?.expect("Untraceable code.")
             {
                 settings.name = Some(message.to_owned());
                 settings
             } else if let State::SettingsUpdate(mut settings, SettingsKeyboard::MessageLimit) =
-            dialogue.get().await?.expect("Untraceable code.")
+                dialogue.get().await?.expect("Untraceable code.")
             {
                 match message.parse::<u32>() {
                     Ok(limit) => {
@@ -69,7 +69,7 @@ impl MessageHandler {
                                     &settings.lang.settings_descriptions.limit
                                 ),
                             )
-                                .await?;
+                            .await?;
                             return Ok(());
                         }
                         settings
@@ -84,7 +84,7 @@ impl MessageHandler {
                                 &settings.lang.fail_messages.need_number
                             ),
                         )
-                            .await?;
+                        .await?;
                         return Ok(());
                     }
                 }
@@ -96,7 +96,6 @@ impl MessageHandler {
                 .reply_markup(keyboard)
                 .await?;
             dialogue.update(State::CallBack(settings)).await?;
-
         }
 
         Ok(())
@@ -126,7 +125,9 @@ impl MessageHandler {
     ) -> ReturnTy {
         if let Some(message) = message.text() {
             let user_setting = CommandsHandler::get_settings(&dialogue).await?;
-            if let Some(result) = DrinksService::find_by_category(message, user_setting.lang.clone()).await? {
+            if let Some(result) =
+                DrinksService::find_by_category(message, user_setting.lang.clone()).await?
+            {
                 Self::send_vec_with_photo(&result, &bot, &dialogue).await?;
             } else {
                 Self::send_wrong_message("Seems like it was wrong category", &bot, &dialogue)
@@ -142,7 +143,9 @@ impl MessageHandler {
     ) -> ReturnTy {
         if let Some(message) = message.text() {
             let user_settings = CommandsHandler::get_settings(&dialogue).await?;
-            if let Some(result) = DrinksService::find_by_ingredient(message, user_settings.lang).await? {
+            if let Some(result) =
+                DrinksService::find_by_ingredient(message, user_settings.lang).await?
+            {
                 Self::send_vec_with_photo(&result, &bot, &dialogue).await?;
             } else {
                 Self::send_wrong_message("Seems like it was wrong ingredient", &bot, &dialogue)
@@ -166,7 +169,7 @@ impl MessageHandler {
                 Emojis::ShitHappens.random()?
             ),
         )
-            .await?;
+        .await?;
         Ok(())
     }
     async fn send_vec_with_photo<T>(
@@ -174,8 +177,8 @@ impl MessageHandler {
         bot: &AutoSend<Bot>,
         dialogue: &LocalDialogue,
     ) -> ReturnTy
-        where
-            T: Display + WithPhoto,
+    where
+        T: Display + WithPhoto,
     {
         let settings = CommandsHandler::get_settings(dialogue).await?;
         if settings.send_image {
@@ -212,7 +215,9 @@ impl MessageHandler {
     ) -> ReturnTy {
         if let Some(message) = message.text() {
             let user_settings = CommandsHandler::get_settings(&dialogue).await?;
-            if let Some(result) = DrinksService::get_ingredient_by_name(message, user_settings.lang.clone()).await? {
+            if let Some(result) =
+                DrinksService::get_ingredient_by_name(message, user_settings.lang.clone()).await?
+            {
                 for result in result {
                     CallBackHandler::send_message(&result.to_string(), &bot, &dialogue).await?;
                 }

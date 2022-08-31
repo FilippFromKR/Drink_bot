@@ -16,9 +16,9 @@ use teloxide::{dptree, Bot};
 mod cocktails_api;
 pub mod config;
 mod error;
+mod localization;
 mod telegramm;
 mod utils;
-mod localization;
 
 pub struct TelegrammBuilder;
 
@@ -69,7 +69,6 @@ impl TelegrammBuilder {
                     ty: ErrorType::Database,
                 })?
                 .erase();
-
 
         let handler = Self::create_handler();
 
