@@ -8,4 +8,5 @@ pub struct Env {
     pub rust_log: String,
     pub workers_number: usize,
     pub blocking_treads: usize,
+    pub db_path: String,
 }

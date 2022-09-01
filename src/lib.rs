@@ -64,7 +64,7 @@ impl TelegrammBuilder {
         log::info!("Waking up with variables {:?}...", &env);
 
         let storage: std::sync::Arc<ErasedStorage<State>> =
-            SqliteStorage::open("./db/db.sqlite", Json)
+            SqliteStorage::open(&env.db_path, Json)
                 .await
                 .map_err(|error| ErrorHandler {
                     msg: error.to_string(),
