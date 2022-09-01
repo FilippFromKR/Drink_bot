@@ -20,8 +20,7 @@ mod localization;
 mod telegramm;
 mod utils;
 
-
-/// todo: make tests work and add it to workflow
+/// Todo: add all commands to BotFather + help with descripton
 pub struct TelegrammBuilder;
 
 impl TelegrammBuilder {
@@ -87,7 +86,8 @@ impl TelegrammBuilder {
     }
     fn create_handler() -> UpdateHandler<ErrorHandler> {
         let commands_handler = teloxide::filter_command::<StartCommands, _>()
-            .branch(case![State::Start].endpoint(CommandsHandler::start_commands));
+            .branch(dptree::entry().endpoint(CommandsHandler::back));
+
 
         let message_handler = Update::filter_message()
             .branch(commands_handler)
@@ -116,7 +116,10 @@ impl TelegrammBuilder {
             .branch(case![State::Settings(settings)].endpoint(CallBackHandler::callback_settings));
 
         dialogue::enter::<Update, ErasedStorage<State>, State, _>()
+
             .branch(message_handler)
             .branch(callback_handler)
+
+
     }
 }

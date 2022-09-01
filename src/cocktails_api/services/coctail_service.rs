@@ -164,38 +164,38 @@ pub mod tests {
 
     #[tokio::test]
     async fn test_drink_by_name() {
-        let result = DrinksService::get_drink_by_name("Margarita", &Lang::Ukr).await;
+        let result = DrinksService::get_drink_by_name("Margarita", Lang::Ukr).await;
 
         assert!(result.is_ok())
     }
 
     #[tokio::test]
     async fn test_get_ingr_by_name() {
-        let result = DrinksService::get_ingredient_by_name("Vodka").await;
+        let result = DrinksService::get_ingredient_by_name("Vodka",Lang::Ukr).await;
         assert!(result.is_ok())
     }
 
     #[tokio::test]
     async fn test_get_all_ingr() {
-        let result = DrinksService::get_all_ingredients().await;
+        let result = DrinksService::get_all_ingredients(Lang::Ukr).await;
         assert!(result.is_ok())
     }
 
     #[tokio::test]
     async fn test_find_by_ingr() {
-        let result = DrinksService::find_by_ingredient("Vodka").await;
+        let result = DrinksService::find_by_ingredient("Vodka",Lang::Ukr).await;
         assert!(result.is_ok())
     }
 
     #[tokio::test]
     async fn test_get_all_category() {
-        let result = DrinksService::get_all_category().await;
+        let result = DrinksService::get_all_category(Lang::Ukr).await;
         assert!(result.is_ok())
     }
 
     #[tokio::test]
     async fn test_find_by_category() {
-        let result = DrinksService::find_by_category("Cocktail").await;
+        let result = DrinksService::find_by_category("Cocktail",Lang::Ukr).await;
         assert!(result.is_ok())
     }
 }

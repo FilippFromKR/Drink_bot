@@ -69,8 +69,8 @@ impl CallBackHandler {
                         true => false,
                         false => true,
                     };
+                    dialogue.update(State::Settings(user_settings.clone())).await?;
                     Self::send_setting_message(&bot, &dialogue, &user_settings.lang).await?;
-                    dialogue.update(State::Settings(user_settings)).await?;
                 }
                 SettingsKeyboard::MessageLimit => {
                     bot.send_message(
@@ -164,7 +164,8 @@ impl CallBackHandler {
             user_settings.lang.clone(),
         )
         .await?
-        {
+
+        { let result =  Self::make_less(result);
             let alcohol = Self::ingredients_as_str_vec(&result);
             let keyboard = make_keyboard(&alcohol[0..2]);
             bot.send_message(dialogue.chat_id(), &user_settings.lang.todo.game_choose)
@@ -180,6 +181,16 @@ impl CallBackHandler {
                 .await?;
         }
         Ok(())
+    }
+    fn make_less(vec:Vec<LangDrink>)->Vec<LangDrink>{
+        vec.into_iter()
+            .enumerate()
+            .filter_map(|(num,drink)|  match num%2 == 0 {
+                true => Some(drink),
+                _ => None,
+            } )
+            .collect::<Vec<LangDrink>>()
+
     }
 
     fn ingredients_as_str_vec(raw_drink: &[LangDrink]) -> Vec<&str> {

@@ -108,10 +108,11 @@ impl MessageHandler {
     ) -> ReturnTy {
         if let Some(message) = message.text() {
             let UserSettings { lang, .. } = CommandsHandler::get_settings(&dialogue).await?;
+            let fail_message = lang.fail_messages.non_results.clone();
             if let Some(result) = DrinksService::get_drink_by_name(message, lang).await? {
                 Self::send_vec_with_photo(&result, &bot, &dialogue).await?;
             } else {
-                Self::send_wrong_message("Seems like we don't find anything", &bot, &dialogue)
+                Self::send_wrong_message(&fail_message, &bot, &dialogue)
                     .await?;
             }
         }
@@ -130,7 +131,7 @@ impl MessageHandler {
             {
                 Self::send_vec_with_photo(&result, &bot, &dialogue).await?;
             } else {
-                Self::send_wrong_message("Seems like it was wrong category", &bot, &dialogue)
+                Self::send_wrong_message(&user_setting.lang.fail_messages.wrong_category, &bot, &dialogue)
                     .await?;
             }
         }
@@ -144,11 +145,11 @@ impl MessageHandler {
         if let Some(message) = message.text() {
             let user_settings = CommandsHandler::get_settings(&dialogue).await?;
             if let Some(result) =
-                DrinksService::find_by_ingredient(message, user_settings.lang).await?
+                DrinksService::find_by_ingredient(message, user_settings.lang.clone()).await?
             {
                 Self::send_vec_with_photo(&result, &bot, &dialogue).await?;
             } else {
-                Self::send_wrong_message("Seems like it was wrong ingredient", &bot, &dialogue)
+                Self::send_wrong_message(&user_settings.lang.fail_messages.wrong_ingredient, &bot, &dialogue)
                     .await?;
             }
         }
@@ -200,7 +201,7 @@ impl MessageHandler {
     }
     fn get_range(vec_len: usize, settings_params: usize) -> (usize, usize) {
         match vec_len > settings_params {
-            false => (0_usize, vec_len - 1),
+            false => (0_usize, vec_len),
             _ => {
                 let random_start = random_num_in_range(0, vec_len - settings_params as usize);
                 (random_start, random_start + settings_params)
@@ -224,7 +225,7 @@ impl MessageHandler {
 
                 CommandsHandler::start_commands(&bot, &dialogue).await?;
             } else {
-                Self::send_wrong_message("Seems like it was wrong ingredient", &bot, &dialogue)
+                Self::send_wrong_message(&user_settings.lang.fail_messages.wrong_ingredient, &bot, &dialogue)
                     .await?;
             }
         }
