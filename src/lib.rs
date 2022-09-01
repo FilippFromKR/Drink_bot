@@ -20,8 +20,9 @@ mod localization;
 mod telegramm;
 mod utils;
 
-/// Todo: add all commands to BotFather + help with descripton
-/// make workflow work
+/// 1)Todo: add all(think what we exactle need her) commands to BotFather + help with descripton
+/// 2)make workflow work
+/// 3)create random future(gat random cock tail)
 pub struct TelegrammBuilder;
 
 impl TelegrammBuilder {
@@ -87,7 +88,7 @@ impl TelegrammBuilder {
     }
     fn create_handler() -> UpdateHandler<ErrorHandler> {
         let commands_handler = teloxide::filter_command::<StartCommands, _>()
-            .branch(dptree::entry().endpoint(CommandsHandler::back));
+            .branch(dptree::entry().endpoint(CommandsHandler::handle_commands));
 
 
         let message_handler = Update::filter_message()

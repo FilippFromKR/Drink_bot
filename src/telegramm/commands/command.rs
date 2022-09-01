@@ -7,4 +7,5 @@ rename = "lowercase",
 )]
 pub enum StartCommands {
     Back,
+    Random,
 }

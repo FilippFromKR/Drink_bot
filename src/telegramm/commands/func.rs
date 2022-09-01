@@ -1,12 +1,15 @@
-use teloxide::prelude::*;
 use teloxide::Bot;
+use teloxide::prelude::*;
+use crate::cocktails_api::schemas::drink::LangDrink;
 
+use crate::cocktails_api::services::coctail_service::DrinksService;
 use crate::error::error_handler::ErrorHandler;
-use crate::StartCommands;
+use crate::{MessageHandler, StartCommands};
+use crate::telegramm::{LocalDialogue, ReturnTy};
 use crate::telegramm::buttons::keyboard::{make_keyboard, standard_keyboard_as_str_vec};
 use crate::telegramm::settings::settings::UserSettings;
 use crate::telegramm::state::State;
-use crate::telegramm::{LocalDialogue, ReturnTy};
+use crate::utils::helpers::{random_english_character, random_num_in_range};
 
 pub struct CommandsHandler;
 
@@ -25,20 +28,39 @@ impl CommandsHandler {
 
         Ok(())
     }
-    #[allow(irrefutable_let_patterns)]
-    pub async fn back(bot: AutoSend<Bot>, dialogue: LocalDialogue,command: StartCommands)->ReturnTy {
-       if let StartCommands::Back = command {
-           CommandsHandler::start_commands(&bot, &dialogue).await?;
-       }
-
+    pub async fn handle_commands(bot: AutoSend<Bot>, dialogue: LocalDialogue, command: StartCommands)-> ReturnTy{
+         match command {
+             StartCommands::Back => Self::start_commands(&bot,&dialogue).await?,
+             StartCommands::Random => Self::random(&bot,&dialogue).await?,
+         }
         Ok(())
     }
 
-    pub async fn get_settings(dialogue: &LocalDialogue) -> Result<UserSettings, ErrorHandler> {
-        let state = dialogue.get().await?.expect("Untraceable code.");
-        match state.get_settings() {
-            Some(settings) => Ok(settings),
-            None => Ok(UserSettings::default()),
+    async fn random(bot: &AutoSend<Bot>, dialogue: &LocalDialogue) -> ReturnTy {
+      let mut drinks =  Self::till_get(&dialogue).await?;
+        let random_num = random_num_in_range(0,drinks.len());
+        MessageHandler::send_vec_with_photo(&vec![drinks.remove(random_num)],&bot,&dialogue).await?;
+        Ok(())
+    }
+     async fn till_get(dialogue: &LocalDialogue) -> Result<Vec<LangDrink>, ErrorHandler> {
+    let UserSettings { lang, .. } = CommandsHandler::get_settings(&dialogue).await?;
+        loop {
+            match DrinksService::search_by_first_letter(
+                &random_english_character()?,
+                lang.clone(),
+            )
+                .await? {
+                Some(drinks) => { return Ok(drinks); }
+                None => {}
+            };
         }
     }
-}
+
+        pub async fn get_settings(dialogue: &LocalDialogue) -> Result<UserSettings, ErrorHandler> {
+            let state = dialogue.get().await?.expect("Untraceable code.");
+            match state.get_settings() {
+                Some(settings) => Ok(settings),
+                None => Ok(UserSettings::default()),
+            }
+        }
+    }

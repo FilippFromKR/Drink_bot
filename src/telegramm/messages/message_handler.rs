@@ -172,7 +172,7 @@ impl MessageHandler {
         .await?;
         Ok(())
     }
-    async fn send_vec_with_photo<T>(
+    pub async fn send_vec_with_photo<T>(
         to_send: &Vec<T>,
         bot: &AutoSend<Bot>,
         dialogue: &LocalDialogue,
