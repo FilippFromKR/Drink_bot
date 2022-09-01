@@ -118,7 +118,6 @@ impl MessageHandler {
         }
         Ok(())
     }
-    /// todo: will be goood to send some tips
     pub async fn with_category(
         message: Message,
         bot: AutoSend<Bot>,
@@ -164,7 +163,7 @@ impl MessageHandler {
         bot.send_message(
             dialogue.chat_id(),
             format!(
-                "{} {},{}, try again please.",
+                "{}. {}{}",
                 settings.name.unwrap_or_else(|| "".to_string()),
                 message,
                 Emojis::ShitHappens.random()?

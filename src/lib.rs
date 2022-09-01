@@ -21,6 +21,7 @@ mod telegramm;
 mod utils;
 
 /// Todo: add all commands to BotFather + help with descripton
+/// make workflow work
 pub struct TelegrammBuilder;
 
 impl TelegrammBuilder {
