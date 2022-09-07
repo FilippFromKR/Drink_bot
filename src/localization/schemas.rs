@@ -38,6 +38,7 @@ pub struct Todo {
     pub ingredient_write: String,
     pub find_cocktails_write: String,
     pub find_ingredient_write: String,
+    pub suggestion: String,
 }
 
 #[derive(Debug, Deserialize)]

@@ -8,4 +8,6 @@ rename = "lowercase",
 pub enum StartCommands {
     Back,
     Random,
+    #[command(rename = "suggestion")]
+    SuggestionAndBags
 }

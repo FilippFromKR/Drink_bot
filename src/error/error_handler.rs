@@ -9,6 +9,7 @@ pub enum ErrorType {
     Parse,
     Service,
     Database,
+    File,
 }
 
 #[derive(Debug)]

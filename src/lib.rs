@@ -13,6 +13,8 @@ use teloxide::dispatching::{dialogue, Dispatcher, UpdateFilterExt, UpdateHandler
 use teloxide::dptree::case;
 use teloxide::prelude::{RequesterExt, Update};
 use teloxide::{dptree, Bot};
+use crate::dptree::endpoint;
+
 mod cocktails_api;
 pub mod config;
 mod error;
@@ -22,7 +24,6 @@ mod utils;
 
 /// 1)Todo: add all(think what we exactle need her) commands to BotFather + help with descripton
 /// 2)make workflow work
-/// 3)create random future(gat random cock tail)
 pub struct TelegrammBuilder;
 
 impl TelegrammBuilder {
@@ -103,6 +104,7 @@ impl TelegrammBuilder {
             .branch(
                 case![State::SettingsUpdate(settings, params)].endpoint(MessageHandler::settings),
             )
+            .branch(case![State::Suggestion(settings)].endpoint(MessageHandler::suggestion))
             .branch(dptree::entry().endpoint(MessageHandler::unexpected_message));
 
         let callback_handler = Update::filter_callback_query()

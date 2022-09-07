@@ -12,6 +12,7 @@ pub enum State {
     FindByName(UserSettings),
     FindIngrByName(UserSettings),
     AllIngredients(UserSettings),
+    Suggestion(UserSettings),
     WithIngredient(UserSettings),
     WithCategory(UserSettings),
     CocktailForYou {
@@ -33,6 +34,7 @@ impl State {
             State::CocktailForYou { settings, .. } => Some(settings.clone()),
             State::Settings(setting) => Some(setting.clone()),
             State::SettingsUpdate(settings, ..) => Some(settings.clone()),
+            State::Suggestion(settings) => Some(settings.clone()),
             State::Start => None,
         }
     }
