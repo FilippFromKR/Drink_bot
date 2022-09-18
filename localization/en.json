@@ -1,0 +1,61 @@
+{
+  "send_commands": "Here we go: ",
+  "fail_messages": {
+    "unexpected": "Unexpected message.",
+    "game_limit": "Limit can be between 2 and 80, please, try again.",
+    "need_number": "it should be a number.",
+    "non_results": "Seems like we found nothing.",
+    "wrong_category": "Seems like it was wrong category.",
+    "wrong_ingredient": "Seems like it was wrong ingredient.",
+    "try_again": "try again please"
+  },
+  "todo": {
+    "settings_set_limit": "Please enter the message limit (min - 3, max - 80 ).",
+    "settings_set_name": "Please enter your name.",
+    "game_choose": "Choose one.",
+    "category_write": "Enter the name of the Category. Examples: Beer, Soft Drink.",
+    "ingredient_write": "Enter the name of the Ingredient. Examples: Tequila, Coffee.",
+    "find_cocktails_write": "What kind of cocktail do you want to find? \nEnter the name or part of the name of the beverage . Examples: Coffee, Negroni.",
+    "find_ingredient_write": "What kind of Ingredient do you want to find? \nEnter the name of the Ingredient. Examples: Tequila, Coffee.",
+    "suggestion": "Write your suggestion on tell as about bug, please."
+  },
+  "service_responses": {
+    "beverage_name": "Beverage name: ",
+    "ty": "Type : ",
+    "category": "Category is: ",
+    "alco": "It is with alcohol: ",
+    "cook": "How to cook: ",
+    "glass": "Use this glass for it: ",
+    "ingredient_name": "Name of ingredient: ",
+    "description": "Description: "
+  },
+  "settings_descriptions": {
+    "name": "As far as i know, your name is: ",
+    "lang": "Choose language, current language is:",
+    "lang_ukr": "Ukr",
+    "lang_eng": "Eng",
+    "yes": "Yes.",
+    "no": "No.",
+    "image": "This parameter defines if the images will be shown or not. Current configuration is: ",
+    "limit": "Limit defines the max value of received messages at once. \nSome responses could include a dozens of it, \nwe predict that it may be annoying. \nThe algorithm chooses a random slice of all results, so you will not lose anything, so feel free to configure it. Current amount of messages is: "
+  },
+  "buttons": {
+    "main": {
+      "FindCocktail": "Find cocktail",
+      "FindIngredient": "Find ingredient",
+      "Ingredients": "Ingredients",
+      "Categories": "Categories",
+      "WithThisIngredient": "With this ingredient",
+      "WithThisCategory": "With this category",
+      "DrinkForYou": "Drink for you",
+      "Settings": "Settings"
+    },
+    "settings": {
+      "Name": "Name",
+      "Images": "Images",
+      "MessageLimit": "Message limit",
+      "Lang": "Lang",
+      "Back": "Back"
+    }
+  }
+}

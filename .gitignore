@@ -2,6 +2,6 @@
 /.env
 /Cargo.lock
 /Dockerfile
-/localization
+
 /db
 /suggestion_bags

@@ -6,13 +6,4 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - ./db/:/root/db/
-  app:
-    build:
-      context: ""
-    image: cloudolife/col-rust-docker
-    # ports:
-    #   - "8080:8080"
-    # restart: on-failure
-    volumes:
-      - ".:/Bar_Bot"
+      - ./db/db.sqlite
