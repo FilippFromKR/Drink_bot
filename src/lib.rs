@@ -13,7 +13,6 @@ use teloxide::dispatching::{dialogue, Dispatcher, UpdateFilterExt, UpdateHandler
 use teloxide::dptree::case;
 use teloxide::prelude::{RequesterExt, Update};
 use teloxide::{dptree, Bot};
-use crate::dptree::endpoint;
 
 mod cocktails_api;
 pub mod config;
@@ -65,14 +64,13 @@ impl TelegrammBuilder {
         pretty_env_logger::init();
         log::info!("Waking up with variables {:?}...", &env);
 
-        let storage: std::sync::Arc<ErasedStorage<State>> =
-            SqliteStorage::open(&env.db_path, Json)
-                .await
-                .map_err(|error| ErrorHandler {
-                    msg: error.to_string(),
-                    ty: ErrorType::Database,
-                })?
-                .erase();
+        let storage: std::sync::Arc<ErasedStorage<State>> = SqliteStorage::open(&env.db_path, Json)
+            .await
+            .map_err(|error| ErrorHandler {
+                msg: error.to_string(),
+                ty: ErrorType::Database,
+            })?
+            .erase();
 
         let handler = Self::create_handler();
 
@@ -90,7 +88,6 @@ impl TelegrammBuilder {
     fn create_handler() -> UpdateHandler<ErrorHandler> {
         let commands_handler = teloxide::filter_command::<StartCommands, _>()
             .branch(dptree::entry().endpoint(CommandsHandler::handle_commands));
-
 
         let message_handler = Update::filter_message()
             .branch(commands_handler)
@@ -120,10 +117,7 @@ impl TelegrammBuilder {
             .branch(case![State::Settings(settings)].endpoint(CallBackHandler::callback_settings));
 
         dialogue::enter::<Update, ErasedStorage<State>, State, _>()
-
             .branch(message_handler)
             .branch(callback_handler)
-
-
     }
 }

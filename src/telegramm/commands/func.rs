@@ -1,15 +1,15 @@
-use teloxide::Bot;
 use teloxide::prelude::*;
+use teloxide::Bot;
 
-use crate::{MessageHandler, StartCommands};
 use crate::cocktails_api::schemas::drink::LangDrink;
 use crate::cocktails_api::services::coctail_service::DrinksService;
 use crate::error::error_handler::ErrorHandler;
-use crate::telegramm::{LocalDialogue, ReturnTy};
 use crate::telegramm::buttons::keyboard::{make_keyboard, standard_keyboard_as_str_vec};
 use crate::telegramm::settings::settings::UserSettings;
 use crate::telegramm::state::State;
-use crate::utils::helpers::{random_english_character, random_num_in_range, write_to_file};
+use crate::telegramm::{LocalDialogue, ReturnTy};
+use crate::utils::helpers::{random_english_character, random_num_in_range};
+use crate::{MessageHandler, StartCommands};
 
 pub struct CommandsHandler;
 
@@ -28,37 +28,41 @@ impl CommandsHandler {
 
         Ok(())
     }
-    pub async fn handle_commands(bot: AutoSend<Bot>, dialogue: LocalDialogue, command: StartCommands) -> ReturnTy {
+    pub async fn handle_commands(
+        bot: AutoSend<Bot>,
+        dialogue: LocalDialogue,
+        command: StartCommands,
+    ) -> ReturnTy {
         match command {
-            StartCommands::Back => Self::start_commands(&bot,&dialogue).await?,
-            StartCommands::Random => Self::random(&bot,&dialogue).await?,
-            StartCommands::SuggestionAndBags => Self::suggestion_bugs(&bot,&dialogue).await?,
+            StartCommands::Back => Self::start_commands(&bot, &dialogue).await?,
+            StartCommands::Random => Self::random(&bot, &dialogue).await?,
+            StartCommands::SuggestionAndBags => Self::suggestion_bugs(&bot, &dialogue).await?,
         };
         Ok(())
     }
     async fn suggestion_bugs(bot: &AutoSend<Bot>, dialogue: &LocalDialogue) -> ReturnTy {
-        let settings = CommandsHandler::get_settings(&dialogue).await?;
-        bot.send_message(dialogue.chat_id(), &settings.lang.todo.suggestion).await;
+        let settings = CommandsHandler::get_settings(dialogue).await?;
+        bot.send_message(dialogue.chat_id(), &settings.lang.todo.suggestion)
+            .await?;
         dialogue.update(State::Suggestion(settings)).await?;
         Ok(())
     }
 
     async fn random(bot: &AutoSend<Bot>, dialogue: &LocalDialogue) -> ReturnTy {
-        let mut drinks = Self::till_get(&dialogue).await?;
+        let mut drinks = Self::till_get(dialogue).await?;
         let random_num = random_num_in_range(0, drinks.len());
-        MessageHandler::send_vec_with_photo(&vec![drinks.remove(random_num)], &bot, &dialogue).await?;
+        MessageHandler::send_vec_with_photo(&vec![drinks.remove(random_num)], bot, dialogue)
+            .await?;
         Ok(())
     }
     async fn till_get(dialogue: &LocalDialogue) -> Result<Vec<LangDrink>, ErrorHandler> {
-        let UserSettings { lang, .. } = CommandsHandler::get_settings(&dialogue).await?;
+        let UserSettings { lang, .. } = CommandsHandler::get_settings(dialogue).await?;
         loop {
-            match DrinksService::search_by_first_letter(
-                &random_english_character()?,
-                lang.clone(),
-            )
-                .await? {
-                Some(drinks) => { return Ok(drinks); }
-                None => {}
+          if let Some(drinks ) = DrinksService::search_by_first_letter(&random_english_character()?, lang.clone())
+                .await?
+            {
+               return Ok(drinks)
+
             };
         }
     }

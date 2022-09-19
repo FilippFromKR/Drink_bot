@@ -1,12 +1,12 @@
 use std::fmt::Display;
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::prelude::*;
 
 use rand::distributions::Uniform;
 use rand::prelude::Distribution;
 
-use crate::{ErrorHandler, ErrorType};
 use crate::telegramm::messages::message_handler::TELEGRAMM_CHAR_LIMIT;
+use crate::{ErrorHandler, ErrorType};
 
 pub fn random_num_in_range(min: usize, max: usize) -> usize {
     let mut rng = rand::thread_rng();
@@ -54,11 +54,14 @@ pub fn write_to_file(text: &str) -> Result<(), ErrorHandler> {
         .write(true)
         .append(true)
         .open("./suggestion_bags/suggestion.txt")
-        .map_err(|err| ErrorHandler
-        { msg: err.to_string(), ty: ErrorType::File })?;
+        .map_err(|err| ErrorHandler {
+            msg: err.to_string(),
+            ty: ErrorType::File,
+        })?;
 
-    writeln!(file, "{}\n_____________________________\n" ,text)
-        .map_err(|err| ErrorHandler
-        { msg: err.to_string(), ty: ErrorType::File })?;
+    writeln!(file, "{}\n_____________________________\n", text).map_err(|err| ErrorHandler {
+        msg: err.to_string(),
+        ty: ErrorType::File,
+    })?;
     Ok(())
 }

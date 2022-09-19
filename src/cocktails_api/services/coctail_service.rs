@@ -171,7 +171,7 @@ pub mod tests {
 
     #[tokio::test]
     async fn test_get_ingr_by_name() {
-        let result = DrinksService::get_ingredient_by_name("Vodka",Lang::Ukr).await;
+        let result = DrinksService::get_ingredient_by_name("Vodka", Lang::Ukr).await;
         assert!(result.is_ok())
     }
 
@@ -183,7 +183,7 @@ pub mod tests {
 
     #[tokio::test]
     async fn test_find_by_ingr() {
-        let result = DrinksService::find_by_ingredient("Vodka",Lang::Ukr).await;
+        let result = DrinksService::find_by_ingredient("Vodka", Lang::Ukr).await;
         assert!(result.is_ok())
     }
 
@@ -195,7 +195,7 @@ pub mod tests {
 
     #[tokio::test]
     async fn test_find_by_category() {
-        let result = DrinksService::find_by_category("Cocktail",Lang::Ukr).await;
+        let result = DrinksService::find_by_category("Cocktail", Lang::Ukr).await;
         assert!(result.is_ok())
     }
 }
