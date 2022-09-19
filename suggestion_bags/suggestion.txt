@@ -8,4 +8,10 @@ _____________________________
 _____________________________
 добавить время сюда
 
+______________________________
+/// 1)Todo: add all(think what we exactle need her) commands to BotFather + help with descripton
+/// 2)make workflow work
+______________________________
+change algoritm in string split with correct chars
+
 

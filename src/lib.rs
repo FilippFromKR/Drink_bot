@@ -21,8 +21,7 @@ mod localization;
 mod telegramm;
 mod utils;
 
-/// 1)Todo: add all(think what we exactle need her) commands to BotFather + help with descripton
-/// 2)make workflow work
+
 pub struct TelegrammBuilder;
 
 impl TelegrammBuilder {
