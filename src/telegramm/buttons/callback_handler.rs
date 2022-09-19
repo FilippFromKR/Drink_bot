@@ -59,7 +59,7 @@ impl CallBackHandler {
     ) -> ReturnTy {
         if let Some(callback) = callback.data {
             let mut user_settings = CommandsHandler::get_settings(&dialogue).await?;
-            let button_key = Self::to_setting_button(&callback, &user_settings.lang);
+            let button_key = Self::to_setting_button(&callback, &user_settings.lang)?;
             match SettingsKeyboard::try_from(button_key.as_str())? {
                 SettingsKeyboard::Back => {
                     return CommandsHandler::start_commands(&bot, &dialogue).await;
@@ -112,14 +112,15 @@ impl CallBackHandler {
         }
         Ok(())
     }
-    fn to_setting_button(response: &str, lang: &Lang) -> String {
+    fn to_setting_button(response: &str, lang: &Lang) -> Result<String,ErrorHandler> {
         let (key, _) = lang
             .buttons
             .settings
             .iter()
             .find(|(_, value)| *value == response)
-            .expect("Unreachable code.");
-        key.clone()
+            .ok_or(
+                ErrorHandler{ msg: "Old commands".to_string(), ty: ErrorType::Telegramm })?;
+        Ok(key.clone())
     }
 
     async fn settings(bot: AutoSend<Bot>, dialogue: LocalDialogue) -> ReturnTy {

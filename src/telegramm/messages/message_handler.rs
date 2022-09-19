@@ -51,8 +51,22 @@ impl MessageHandler {
             let settings = if let State::SettingsUpdate(mut settings, SettingsKeyboard::Name) =
             dialogue.get().await?.expect("Untraceable code.")
             {
-                settings.name = Some(message.to_owned());
-                settings
+                if message.len() > 3 && message.len() < 15 {
+                    settings.name = Some(message.to_owned());
+                    settings
+                }
+                else {
+                    bot.send_message(
+                        dialogue.chat_id(),
+                        format!(
+                            "{}, {}",
+                            &settings.name.unwrap_or_else(|| "".to_string()),
+                            &settings.lang.settings_descriptions.limit_name
+                        ),
+                    )
+                        .await?;
+                    return Ok(());
+                }
             } else if let State::SettingsUpdate(mut settings, SettingsKeyboard::MessageLimit) =
             dialogue.get().await?.expect("Untraceable code.")
             {
@@ -104,6 +118,8 @@ impl MessageHandler {
         if let Some(message) = message.text() {
             write_to_file(message);
         }
+        let settings = CommandsHandler::get_settings(&dialogue).await?;
+        bot.send_message(dialogue.chat_id(),&settings.lang.fail_messages.suggestion).await?;
         CommandsHandler::start_commands(&bot, &dialogue).await?;
         Ok(())
     }

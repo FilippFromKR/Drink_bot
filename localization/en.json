@@ -7,7 +7,8 @@
     "non_results": "Seems like we found nothing.",
     "wrong_category": "Seems like it was wrong category.",
     "wrong_ingredient": "Seems like it was wrong ingredient.",
-    "try_again": "try again please"
+    "try_again": "try again please",
+    "suggestion": "Done!"
   },
   "todo": {
     "settings_set_limit": "Please enter the message limit (min - 3, max - 80 ).",
@@ -17,7 +18,7 @@
     "ingredient_write": "Enter the name of the Ingredient. Examples: Tequila, Coffee.",
     "find_cocktails_write": "What kind of cocktail do you want to find? \nEnter the name or part of the name of the beverage . Examples: Coffee, Negroni.",
     "find_ingredient_write": "What kind of Ingredient do you want to find? \nEnter the name of the Ingredient. Examples: Tequila, Coffee.",
-    "suggestion": "Write your suggestion on tell as about bug, please."
+    "suggestion": "Thanks for your letter."
   },
   "service_responses": {
     "beverage_name": "Beverage name: ",
@@ -37,7 +38,8 @@
     "yes": "Yes.",
     "no": "No.",
     "image": "This parameter defines if the images will be shown or not. Current configuration is: ",
-    "limit": "Limit defines the max value of received messages at once. \nSome responses could include a dozens of it, \nwe predict that it may be annoying. \nThe algorithm chooses a random slice of all results, so you will not lose anything, so feel free to configure it. Current amount of messages is: "
+    "limit": "Limit defines the max value of received messages at once. \nSome responses could include a dozens of it, \nwe predict that it may be annoying. \nThe algorithm chooses a random slice of all results, so you will not lose anything, so feel free to configure it. Current amount of messages is: ",
+    "limit_name": "Name should be from 3 to 15 characters. "
   },
   "buttons": {
     "main": {

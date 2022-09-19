@@ -10,6 +10,7 @@ pub enum ErrorType {
     Service,
     Database,
     File,
+    User,
 }
 
 #[derive(Debug)]

@@ -27,6 +27,7 @@ pub struct FailMessages {
     pub wrong_category: String,
     pub wrong_ingredient: String,
     pub try_again: String,
+    pub suggestion: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -63,4 +64,5 @@ pub struct SettingsDescriptions {
     pub no: String,
     pub image: String,
     pub limit: String,
+    pub limit_name: String,
 }
